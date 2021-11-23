@@ -1,6 +1,8 @@
+// Package ui provides functions for drawing stuff on the screen.
 package ui
 
 import (
+	"cryptokobo/app/fs"
 	"image"
 
 	"github.com/fogleman/gg"
@@ -45,10 +47,10 @@ func InitScreen() (screen *Screen) {
 }
 
 func (screen *Screen) SetFontSettings(fontConfig FontConfig) {
-	screen.ggContext.LoadFontFace("/mnt/onboard/.adds/cryptokobo/assets/font.ttf", fontConfig.Size)
+	screen.ggContext.LoadFontFace(fs.GetAbsolutePath("assets/font.ttf"), fontConfig.Size)
 }
 
-func (screen *Screen) ClearScreen() {
+func (screen *Screen) Clear() {
 	screen.fb.ClearScreen(&gofbink.FBInkConfig{IsFlashing: true})
 }
 

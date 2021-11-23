@@ -1,12 +1,11 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"os"
 	"time"
 
-	"cryptokobo/ui"
+	"cryptokobo/app"
+	"cryptokobo/app/ui"
 )
 
 var (
@@ -14,22 +13,22 @@ var (
 )
 
 func main() {
-	screen := ui.InitScreen()
+	app := app.InitApp(version)
+	defer app.TearDown()
 
-	screen.ClearScreen()
-	defer screen.Close()
+	screen := app.Screen
 
+	screen.Clear()
 	screen.DrawText("CryptoKobo", 100, 200)
 	screen.SetFontSettings(ui.FontConfig{Size: 40})
-	screen.DrawText(fmt.Sprintf("Version: %s", version), 100, 310)
+	screen.DrawText(fmt.Sprintf("Version: %s", app.Version), 100, 310)
 	screen.DrawText("Get the latest version @ https://ruud.je/cryptokobo", 100, 365)
 
-	screen.DrawFrame()
-
-	if _, err := os.Stat("./config.ini"); errors.Is(err, os.ErrNotExist) {
-		screen.DrawText("Could not load \"config.ini\"", 100, 460)
-		screen.DrawText("Add your \"config.ini\" file to \"/.adds/cryptokobo\"", 100, 515)
-		screen.DrawText("Rebooting in 10 seconds...", 100, 570)
+	configErr := app.LoadConfig()
+	if configErr != nil {
+		screen.DrawText(configErr.Error(), 100, 460)
+	} else {
+		screen.DrawText("Successfully loaded config", 100, 460)
 	}
 
 	screen.DrawFrame()
