@@ -4,53 +4,37 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"time"
 
-	"github.com/shermp/go-fbink-v2/gofbink"
-
-	"cryptokobo/screener"
+	"cryptokobo/ui"
 )
 
 var (
 	version string
 )
 
-func testPrints(fb *gofbink.FBInk, cfg *gofbink.FBInkConfig) {
-	// Test the console like printing feature
-	for i := 0; i < 10; i++ {
-		s := fmt.Sprintf("Test line %d", i)
-		fb.Println(s)
-		fmt.Println(s)
-		time.Sleep(500 * time.Millisecond)
-	}
-	// Lets test last line replacement next
-	fb.PrintLastLn("This should update the last line!")
-	time.Sleep(1 * time.Second)
-	// And we finish with a nice progress bar :)
-	for i := 0; i <= 100; i += 10 {
-		fb.PrintProgressBar(uint8(i), cfg)
-		fmt.Println("Progress bar @", i, "%")
-		time.Sleep(500 * time.Millisecond)
-	}
-}
-
 func main() {
-	exec.Command("killall", "-s", "SIGKILL", "KoboMenu").Run()
-
-	screen := screener.InitScreen()
-
-	if _, err := os.Stat("./config.ini"); errors.Is(err, os.ErrNotExist) {
-		// path/to/whatever does not exist
-	}
+	screen := ui.InitScreen()
 
 	screen.ClearScreen()
 	defer screen.Close()
 
-	screen.Print("CryptoKobo")
-	screen.Print(version)
+	screen.DrawText("CryptoKobo", 100, 200)
+	screen.SetFontSettings(ui.FontConfig{Size: 40})
+	screen.DrawText(fmt.Sprintf("Version: %s", version), 100, 310)
+	screen.DrawText("Get the latest version @ https://ruud.je/cryptokobo", 100, 365)
 
-	time.Sleep(5 * time.Second)
+	screen.DrawFrame()
+
+	if _, err := os.Stat("./config.ini"); errors.Is(err, os.ErrNotExist) {
+		screen.DrawText("Could not load \"config.ini\"", 100, 460)
+		screen.DrawText("Add your \"config.ini\" file to \"/.adds/cryptokobo\"", 100, 515)
+		screen.DrawText("Rebooting in 10 seconds...", 100, 570)
+	}
+
+	screen.DrawFrame()
+
+	time.Sleep(10 * time.Second)
 
 	return
 }
