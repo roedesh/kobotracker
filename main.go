@@ -35,12 +35,14 @@ func main() {
 	screen.DrawFrame()
 
 	client := cmc.InitClient(app.CMCApiKey)
+	screen.DrawText("Fetching data from CoinMarketCap...", 100, 505)
+	screen.DrawFrame()
 
 	_, err := client.GetMap()
 	if err != nil {
-		screen.DrawText("Failed to load cryptocurrency map from CoinMarketCap", 100, 505)
+		screen.DrawText("Failed to load cryptocurrency map from CoinMarketCap", 100, 550)
 	} else {
-		screen.DrawText("Successfully loaded cryptocurrency map", 100, 505)
+		screen.DrawText("Successfully loaded cryptocurrency map", 100, 550)
 	}
 
 	screen.DrawFrame()
