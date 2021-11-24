@@ -1,5 +1,5 @@
 ENTRY=main.go
-BINARY=bin/cryptokobo
+BINARY=cryptokobo
 
 GOOS=linux
 GOARCH=arm
@@ -18,11 +18,11 @@ endif
 
 build:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) CC=$(CC) CXX=$(CXX) go build -ldflags="-X 'main.version=$(VERSION)'" -o $(BINARY) $(ENTRY)
-	@echo Version: $(VERSION)
 
-release:
-	mkdir -p dist
-	tar -cvf dist/cryptokobo.tar.gz --xform='s|.*/||' ${BINARY} scripts/nickel.sh scripts/run.sh
+package:
+	tar -czvf cryptokobo.tar.gz ${BINARY} run.sh assets/*
+
+release: build package clean
 
 clean:
 	go clean
