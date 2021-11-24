@@ -50,16 +50,20 @@ func (screen *Screen) SetFontSettings(fontConfig FontConfig) {
 	screen.ggContext.LoadFontFace(fs.GetAbsolutePath("assets/font.ttf"), fontConfig.Size)
 }
 
-func (screen *Screen) Clear() {
-	screen.fb.ClearScreen(&gofbink.FBInkConfig{IsFlashing: true})
-}
-
 func (screen *Screen) DrawText(text string, x float64, y float64) {
 	screen.ggContext.DrawString(text, x, y)
 }
 
 func (screen *Screen) DrawFrame() {
 	screen.fb.PrintRBGA(0, 0, screen.ggRGBA, &gofbink.FBInkConfig{})
+}
+
+func (screen *Screen) WordWrap(text string) []string {
+	return screen.ggContext.WordWrap(text, 800)
+}
+
+func (screen *Screen) Clear() {
+	screen.fb.ClearScreen(&gofbink.FBInkConfig{IsFlashing: true})
 }
 
 func (screen *Screen) Close() {

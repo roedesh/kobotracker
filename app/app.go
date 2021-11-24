@@ -4,6 +4,7 @@ package app
 import (
 	"cryptokobo/app/fs"
 	"cryptokobo/app/ui"
+
 	"errors"
 	"fmt"
 	"log"
@@ -14,9 +15,9 @@ import (
 )
 
 type App struct {
-	coinMarketCapApiKey string
-	logFile             *os.File
-	tickers             []string
+	CMCApiKey string
+	logFile   *os.File
+	tickers   []string
 
 	Screen  *ui.Screen
 	Version string
@@ -45,8 +46,8 @@ func (app *App) LoadConfig() error {
 		return errors.New(fmt.Sprintf("Could not load \"%s\".", fs.GetAbsolutePath("config.ini")))
 	}
 
-	app.coinMarketCapApiKey = config.Section("").Key("cmc_api_key").String()
-	if app.coinMarketCapApiKey == "" {
+	app.CMCApiKey = config.Section("").Key("cmc_api_key").String()
+	if app.CMCApiKey == "" {
 		return errors.New("CoinMarketCap API key not set. Add \"cmc_api_key\" to your \"config.ini\".")
 	}
 
