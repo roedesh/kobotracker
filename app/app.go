@@ -17,7 +17,7 @@ import (
 type App struct {
 	CMCApiKey string
 	logFile   *os.File
-	tickers   []string
+	Tickers   []string
 
 	Screen  *ui.Screen
 	Version string
@@ -52,9 +52,9 @@ func (app *App) LoadConfig() error {
 	}
 
 	tickers := config.Section("").Key("tickers").String()
-	app.tickers = strings.Fields(tickers)
+	app.Tickers = strings.Fields(tickers)
 
-	if len(app.tickers) == 0 {
+	if len(app.Tickers) == 0 {
 		return errors.New("No tickers set. Add \"tickers\" to your \"config.ini\".")
 	}
 
