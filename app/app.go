@@ -4,7 +4,6 @@ package app
 import (
 	"cryptokobo/app/fs"
 	"cryptokobo/app/ui"
-
 	"errors"
 	"fmt"
 	"log"

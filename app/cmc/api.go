@@ -1,14 +1,13 @@
 package cmc
 
 import (
-	"crypto/tls"
+	"cryptokobo/app/network"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const baseApiUrl = "https://pro-api.coinmarketcap.com/v1"
@@ -28,15 +27,7 @@ func InitClient(apiKey string) (client *Client) {
 func (client *Client) DoRequest(path string) ([]byte, error) {
 	url := fmt.Sprintf("%s/%s", baseApiUrl, path)
 
-	// This is dangerous, but apparently required to make web requests
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	httpClient := http.Client{
-		Timeout:   time.Second * 5,
-		Transport: transport,
-	}
+	httpClient := network.GetHttpClient()
 
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

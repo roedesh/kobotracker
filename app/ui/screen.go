@@ -4,6 +4,7 @@ package ui
 import (
 	"cryptokobo/app/fs"
 	"image"
+	"os"
 
 	"github.com/fogleman/gg"
 	"github.com/shermp/go-fbink-v2/gofbink"
@@ -40,14 +41,27 @@ func InitScreen() (screen *Screen) {
 
 	screen.ggRGBA = image.NewRGBA(image.Rectangle{image.Point{0, 0}, image.Point{int(screen.state.ScreenWidth), int(screen.state.ScreenHeight)}})
 	screen.ggContext = gg.NewContextForRGBA(screen.ggRGBA)
-	screen.ggContext.SetRGBA(0, 0, 0, 1)
+	screen.ggContext.SetRGB(0, 0, 0)
 	screen.SetFontSettings(FontConfig{Size: 80})
+
+	screen.fb.ClearScreen(&gofbink.FBInkConfig{IsFlashing: true})
 
 	return screen
 }
 
 func (screen *Screen) SetFontSettings(fontConfig FontConfig) {
 	screen.ggContext.LoadFontFace(fs.GetAbsolutePath("assets/font.ttf"), fontConfig.Size)
+}
+
+func (screen *Screen) DrawImageFile(path string, x int, y int) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	image, _, err := image.Decode(f)
+	screen.ggContext.DrawImage(image, x, y)
+	return nil
 }
 
 func (screen *Screen) DrawText(text string, x float64, y float64) {
@@ -63,7 +77,9 @@ func (screen *Screen) WordWrap(text string) []string {
 }
 
 func (screen *Screen) Clear() {
-	screen.fb.ClearScreen(&gofbink.FBInkConfig{IsFlashing: true})
+	screen.ggContext.SetRGB(1, 1, 1)
+	screen.ggContext.Clear()
+	screen.ggContext.SetRGB(0, 0, 0)
 }
 
 func (screen *Screen) Close() {

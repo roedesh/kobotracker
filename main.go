@@ -85,9 +85,21 @@ func main() {
 		}
 	}
 
+	time.Sleep(1 * time.Second)
+
+	screen.Clear()
+
+	for index, cryptocurrency := range cryptocurrencies {
+		if cryptocurrency.Logo != "" {
+			imagePath := fs.GetAbsolutePath(fmt.Sprintf("assets/.downloads/logo_%d.png", cryptocurrency.ID))
+			screen.DrawImageFile(imagePath, 100, ((index+1)*80)+100)
+			screen.DrawText(fmt.Sprintf("%s - €%f", cryptocurrency.Symbol, cryptocurrency.Quote.EUR.Price), 175, float64(((index+1)*80)+100))
+		}
+	}
+
 	screen.DrawFrame()
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	return
 }
