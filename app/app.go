@@ -2,65 +2,75 @@
 package app
 
 import (
-	"cryptokobo/app/fs"
+	"cryptokobo/app/network"
 	"cryptokobo/app/ui"
-	"errors"
+	"cryptokobo/app/utils"
 	"fmt"
 	"log"
 	"os"
+	"runtime/debug"
 	"strings"
+	"time"
 
+	"github.com/fogleman/gg"
 	"gopkg.in/ini.v1"
 )
 
 type App struct {
-	CMCApiKey string
-	logFile   *os.File
-	Tickers   []string
+	logFile *os.File
 
-	Screen  *ui.Screen
-	Version string
+	CMCApiKey string
+	CoinGecko *network.CoinGeckoClient
+	Ids       []string
+	Screen    *ui.Screen
+	Version   string
 }
 
 func InitApp(version string) (app *App) {
 	app = &App{}
 	app.Screen = ui.InitScreen()
+	app.CoinGecko = network.InitCoinGecko()
 	app.Version = version
+
+	logFile, err := os.OpenFile(utils.GetAbsolutePath("log.txt"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err == nil {
+		app.logFile = logFile
+		log.SetOutput(app.logFile)
+	}
 
 	return app
 }
 
-func (app *App) SetupLogger() {
-	logFile, err := os.OpenFile(fs.GetAbsolutePath("log.txt"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+func (app *App) LoadConfig() {
+	config, err := ini.Load(utils.GetAbsolutePath("config.ini"))
 	if err != nil {
-		return
-	}
-	app.logFile = logFile
-	log.SetOutput(app.logFile)
-}
-
-func (app *App) LoadConfig() error {
-	config, err := ini.Load(fs.GetAbsolutePath("config.ini"))
-	if err != nil {
-		return errors.New(fmt.Sprintf("Could not load \"%s\".", fs.GetAbsolutePath("config.ini")))
+		panic(fmt.Sprintf("Could not load \"%s\".", utils.GetAbsolutePath("config.ini")))
 	}
 
-	app.CMCApiKey = config.Section("").Key("cmc_api_key").String()
-	if app.CMCApiKey == "" {
-		return errors.New("CoinMarketCap API key not set. Add \"cmc_api_key\" to your \"config.ini\".")
+	ids := config.Section("").Key("ids").String()
+	app.Ids = strings.Fields(ids)
+	if len(app.Ids) == 0 {
+		panic("No CoinGecko ids set. Add \"ids\" to your \"config.ini\".")
 	}
-
-	tickers := config.Section("").Key("tickers").String()
-	app.Tickers = strings.Fields(tickers)
-
-	if len(app.Tickers) == 0 {
-		return errors.New("No tickers set. Add \"tickers\" to your \"config.ini\".")
-	}
-
-	return nil
 }
 
 func (app *App) TearDown() {
+	if err := recover(); err != nil {
+		log.Printf("%s: %s", err, debug.Stack())
+
+		app.Screen.Clear()
+		app.Screen.SetFontSize(60)
+		app.Screen.GG.DrawString("Oops! Something went wrong!", 100, 140)
+		app.Screen.SetFontSize(30)
+		app.Screen.GG.DrawString(fmt.Sprintf("Stacktrace was written to \"%s\"", utils.GetAbsolutePath("log.txt")), 100, 220)
+		app.Screen.GG.DrawString("Rebooting in 5 seconds..", 100, 270)
+		app.Screen.SetFontSize(25)
+		app.Screen.GG.DrawStringWrapped(fmt.Sprintf("%s: %s", err, debug.Stack()), 100, 350, 0, 0, float64(app.Screen.State.ScreenWidth-100), 2, gg.AlignLeft)
+		app.Screen.DrawFrame()
+
+		time.Sleep(5 * time.Second)
+	}
+
 	app.Screen.Close()
 	if app.logFile != nil {
 		app.logFile.Close()

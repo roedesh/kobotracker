@@ -1,0 +1,1 @@
+menu_item:main:CryptoKobo:cmd_spawn:quiet:exec /mnt/onboard/.adds/cryptokobo/run.sh

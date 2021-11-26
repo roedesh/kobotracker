@@ -17,10 +17,10 @@ ifeq ($(VERSION),)
 endif
 
 build:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) CC=$(CC) CXX=$(CXX) go build -ldflags="-X 'main.version=$(VERSION)'" -o $(BINARY) $(ENTRY)
+	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) CC=$(CC) CXX=$(CXX) go build -trimpath -ldflags="-X 'main.version=$(VERSION)'" -o $(BINARY) $(ENTRY)
 
 package:
-	tar -czvf cryptokobo.tar.gz ${BINARY} run.sh assets/*
+	tar -czvf cryptokobo.tar.gz ${BINARY} run.sh nickel.sh assets/* nm/*
 
 release: build package clean
 
