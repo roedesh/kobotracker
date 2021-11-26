@@ -56,7 +56,8 @@ func (app *App) LoadConfig() {
 
 func (app *App) TearDown() {
 	if err := recover(); err != nil {
-		log.Printf("%s: %s", err, debug.Stack())
+		error_message := fmt.Sprintf("%s: %s", err, debug.Stack())
+		log.Println(error_message)
 
 		app.Screen.Clear()
 		app.Screen.SetFontSize(60)
@@ -65,7 +66,7 @@ func (app *App) TearDown() {
 		app.Screen.GG.DrawString(fmt.Sprintf("Stacktrace was written to \"%s\"", utils.GetAbsolutePath("log.txt")), 100, 220)
 		app.Screen.GG.DrawString("Exiting app in 5 seconds..", 100, 270)
 		app.Screen.SetFontSize(25)
-		app.Screen.GG.DrawStringWrapped(fmt.Sprintf("%s: %s", err, debug.Stack()), 100, 350, 0, 0, float64(app.Screen.State.ScreenWidth-100), 2, gg.AlignLeft)
+		app.Screen.GG.DrawStringWrapped(error_message, 100, 350, 0, 0, float64(app.Screen.State.ScreenWidth-100), 2, gg.AlignLeft)
 		app.Screen.DrawFrame()
 
 		time.Sleep(5 * time.Second)
