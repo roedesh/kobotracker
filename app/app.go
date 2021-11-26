@@ -63,7 +63,7 @@ func (app *App) TearDown() {
 		app.Screen.GG.DrawString("Oops! Something went wrong!", 100, 140)
 		app.Screen.SetFontSize(30)
 		app.Screen.GG.DrawString(fmt.Sprintf("Stacktrace was written to \"%s\"", utils.GetAbsolutePath("log.txt")), 100, 220)
-		app.Screen.GG.DrawString("Rebooting in 5 seconds..", 100, 270)
+		app.Screen.GG.DrawString("Exiting app in 5 seconds..", 100, 270)
 		app.Screen.SetFontSize(25)
 		app.Screen.GG.DrawStringWrapped(fmt.Sprintf("%s: %s", err, debug.Stack()), 100, 350, 0, 0, float64(app.Screen.State.ScreenWidth-100), 2, gg.AlignLeft)
 		app.Screen.DrawFrame()

@@ -1,11 +1,10 @@
 package main
 
 import (
+	"cryptokobo/app"
 	"fmt"
 	"log"
 	"time"
-
-	"cryptokobo/app"
 )
 
 var (

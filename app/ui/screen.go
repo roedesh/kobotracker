@@ -48,25 +48,6 @@ func InitScreen() (screen *Screen) {
 	return screen
 }
 
-func (screen *Screen) SetFontSize(size float64) {
-	screen.GG.LoadFontFace(utils.GetAbsolutePath("assets/font.ttf"), size)
-}
-
-// func (screen *Screen) DrawImageFile(path string, x int, y int) error {
-// 	f, err := os.Open(path)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer f.Close()
-// 	image, _, err := image.Decode(f)
-// 	screen.GG.DrawImage(image, x, y)
-// 	return nil
-// }
-
-func (screen *Screen) DrawFrame() {
-	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{})
-}
-
 func (screen *Screen) Clear() {
 	screen.GG.SetRGB(1, 1, 1)
 	screen.GG.Clear()
@@ -75,4 +56,12 @@ func (screen *Screen) Clear() {
 
 func (screen *Screen) Close() {
 	screen.fb.Close()
+}
+
+func (screen *Screen) DrawFrame() {
+	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{})
+}
+
+func (screen *Screen) SetFontSize(size float64) {
+	screen.GG.LoadFontFace(utils.GetAbsolutePath("assets/font.ttf"), size)
 }
