@@ -29,7 +29,7 @@ func InitApp(version string) (app *App) {
 	app.Data = datasource.InitCoinsDataSource()
 	app.Version = version
 
-	logFile, err := os.OpenFile(utils.GetAbsolutePath("log.txt"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(utils.GetAbsolutePath("debug.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err == nil {
 		app.logFile = logFile
 		log.SetOutput(app.logFile)

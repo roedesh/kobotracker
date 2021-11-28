@@ -9,6 +9,11 @@ import (
 	"gopkg.in/ini.v1"
 )
 
+const (
+	defaultShowNextInterval     = 5
+	defaultUpdatePricesInterval = 5
+)
+
 type AppConfig struct {
 	Fiat                string
 	Ids                 []string
@@ -27,9 +32,9 @@ func getConfigFromIniFile() AppConfig {
 	updatePriceInterval, err := iniConfig.Section("").Key("update_price_interval").Int64()
 	if err != nil {
 		log.Println(err.Error())
-		config.UpdatePriceInterval = 5
-	} else if updatePriceInterval < 5 {
-		config.UpdatePriceInterval = 5
+		config.UpdatePriceInterval = defaultUpdatePricesInterval
+	} else if updatePriceInterval < defaultUpdatePricesInterval {
+		config.UpdatePriceInterval = defaultUpdatePricesInterval
 	} else {
 		config.UpdatePriceInterval = updatePriceInterval
 	}
@@ -37,9 +42,9 @@ func getConfigFromIniFile() AppConfig {
 	showNextInterval, err := iniConfig.Section("").Key("show_next_interval").Int64()
 	if err != nil {
 		log.Println(err.Error())
-		config.ShowNextInterval = 8
+		config.ShowNextInterval = defaultShowNextInterval
 	} else if showNextInterval < 1 {
-		config.ShowNextInterval = 8
+		config.ShowNextInterval = defaultShowNextInterval
 	} else {
 		config.ShowNextInterval = showNextInterval
 	}
