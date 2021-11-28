@@ -2,9 +2,10 @@ package main
 
 import (
 	"cryptokobo/app"
-	"fmt"
-	"log"
-	"time"
+	"cryptokobo/app/views"
+
+	"github.com/asaskevich/EventBus"
+	"github.com/shermp/go-kobo-input/koboin"
 )
 
 var (
@@ -12,29 +13,41 @@ var (
 )
 
 func main() {
-	app := app.InitApp(version)
-	defer app.TearDown()
+	cryptokobo := app.InitApp(version)
+	defer cryptokobo.TearDown()
 
-	app.Screen.Clear()
-	app.Screen.GG.DrawString("CryptoKobo", 100, 140)
-	app.Screen.SetFontSize(30)
-	app.Screen.GG.DrawString(fmt.Sprintf("Version: %s", app.Version), 100, 310)
-	app.Screen.GG.DrawString("Get the latest version @ https://ruud.je/cryptokobo", 100, 355)
-	app.Screen.DrawFrame()
-
-	time.Sleep(2 * time.Second)
-
-	app.LoadConfig()
-
-	coins := app.CoinGecko.GetCoinsForIds(app.Ids)
-	coins, err := app.CoinGecko.ApplyPricesToCoins(coins)
-	if err != nil {
-		log.Println(err.Error())
-	} else {
-		app.Screen.GG.DrawString(coins[0].Name, 100, 600)
+	touchPath := "/dev/input/event1"
+	t := koboin.New(touchPath, 1080, 1440)
+	if t == nil {
+		return
 	}
+	defer t.Close()
 
-	app.Screen.DrawFrame()
+	bus := EventBus.New()
 
-	time.Sleep(5 * time.Second)
+	c := make(chan bool)
+	defer close(c)
+
+	bus.SubscribeAsync("QUIT", func() {
+		c <- true
+		return
+	}, false)
+
+	bus.SubscribeAsync("ROUTING", func(routeName string) {
+		switch routeName {
+		case "boot":
+			cryptokobo.LoadConfig()
+			views.BootScreen(cryptokobo, bus)
+		case "tracker":
+			views.TrackerScreen(cryptokobo, bus, t)
+		}
+	}, false)
+
+	bus.Publish("ROUTING", "boot")
+
+	for quit := range c {
+		if quit {
+			break
+		}
+	}
 }
