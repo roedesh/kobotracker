@@ -10,8 +10,10 @@ import (
 )
 
 type AppConfig struct {
-	Fiat string
-	Ids  []string
+	Fiat                string
+	Ids                 []string
+	ShowNextInterval    int64
+	UpdatePriceInterval int64
 }
 
 func getConfigFromIniFile() AppConfig {
@@ -20,6 +22,26 @@ func getConfigFromIniFile() AppConfig {
 	iniConfig, err := ini.Load(utils.GetAbsolutePath("config.ini"))
 	if err != nil {
 		panic(fmt.Sprintf("Could not load \"%s\".", utils.GetAbsolutePath("config.ini")))
+	}
+
+	updatePriceInterval, err := iniConfig.Section("").Key("update_price_interval").Int64()
+	if err != nil {
+		log.Println(err.Error())
+		config.UpdatePriceInterval = 5
+	} else if updatePriceInterval < 5 {
+		config.UpdatePriceInterval = 5
+	} else {
+		config.UpdatePriceInterval = updatePriceInterval
+	}
+
+	showNextInterval, err := iniConfig.Section("").Key("show_next_interval").Int64()
+	if err != nil {
+		log.Println(err.Error())
+		config.ShowNextInterval = 8
+	} else if showNextInterval < 1 {
+		config.ShowNextInterval = 8
+	} else {
+		config.ShowNextInterval = showNextInterval
 	}
 
 	ids := iniConfig.Section("").Key("ids").String()

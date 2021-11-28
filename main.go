@@ -17,11 +17,11 @@ func main() {
 	defer cryptokobo.TearDown()
 
 	touchPath := "/dev/input/event1"
-	t := koboin.New(touchPath, 1080, 1440)
-	if t == nil {
+	touchInput := koboin.New(touchPath, 1080, 1440)
+	if touchInput == nil {
 		return
 	}
-	defer t.Close()
+	defer touchInput.Close()
 
 	bus := EventBus.New()
 
@@ -39,7 +39,7 @@ func main() {
 			cryptokobo.LoadConfig()
 			views.BootScreen(cryptokobo, bus)
 		case "tracker":
-			views.TrackerScreen(cryptokobo, bus, t)
+			views.TrackerScreen(cryptokobo, bus, touchInput)
 		}
 	}, false)
 
