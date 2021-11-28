@@ -2,9 +2,9 @@ package utils
 
 import "strings"
 
-func IsStringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
+func IsStringInSlice(str string, list []string) bool {
+	for _, strFromList := range list {
+		if strFromList == str {
 			return true
 		}
 	}
@@ -12,10 +12,10 @@ func IsStringInSlice(a string, list []string) bool {
 }
 
 func SliceToLowercase(str_slice []string) []string {
-	lowercase_strings := []string{}
+	lowercaseStrings := []string{}
 	for _, str := range str_slice {
-		lowercase_strings = append(lowercase_strings, strings.ToLower(str))
+		lowercaseStrings = append(lowercaseStrings, strings.ToLower(str))
 	}
 
-	return lowercase_strings
+	return lowercaseStrings
 }
