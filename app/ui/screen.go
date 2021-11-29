@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"cryptokobo/app/datasource"
 	"cryptokobo/app/utils"
 	"image"
 
@@ -60,6 +61,26 @@ func (screen *Screen) Close() {
 
 func (screen *Screen) DrawFrame() {
 	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{})
+}
+
+func (screen *Screen) DrawChart(coin datasource.Coin, x float64, y float64, width float64, height float64) {
+	min, max := coin.GetBaselinePrices()
+
+	for index, price := range coin.PricePoints {
+		stepWidth := width / float64(len(coin.PricePoints))
+		newX := float64(x + (stepWidth * float64(index)))
+		percentage := (price - min) / (max - min)
+		newY := y + (height - (height * percentage))
+
+		if index == 0 {
+			screen.GG.MoveTo(newX, newY)
+		} else {
+			screen.GG.LineTo(newX, newY)
+		}
+	}
+
+	screen.GG.SetLineWidth(3)
+	screen.GG.Stroke()
 }
 
 func (screen *Screen) SetFontSize(size float64) {

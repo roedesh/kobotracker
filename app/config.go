@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	defaultShowNextInterval     = 5
-	defaultUpdatePricesInterval = 5
+	defaultShowNextInterval     = 6
+	defaultUpdatePricesInterval = 10
 )
 
 type AppConfig struct {

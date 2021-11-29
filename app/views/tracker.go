@@ -15,18 +15,21 @@ import (
 func renderTrackerScreen(app *app.App, acc accounting.Accounting, lowAcc accounting.Accounting, coinsIndex int) int {
 	app.Screen.Clear()
 	app.Screen.SetFontSize(250)
-	symbol_y := float64(app.Screen.State.ScreenHeight)/2 - 250
-	app.Screen.GG.DrawStringWrapped(app.Data.Coins[coinsIndex].Symbol, 0, symbol_y, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+	coin := app.Data.Coins[coinsIndex]
+	center := float64(app.Screen.State.ScreenHeight) / 2
+	app.Screen.GG.DrawStringWrapped(coin.Symbol, 0, center-350, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	var moneyStr string
-	price := app.Data.Coins[coinsIndex].Price
+
 	app.Screen.SetFontSize(100)
-	if price < 0.01 {
-		moneyStr = lowAcc.FormatMoney(price)
+	if coin.Price < 0.01 {
+		moneyStr = lowAcc.FormatMoney(coin.Price)
 	} else {
-		moneyStr = acc.FormatMoney(price)
+		moneyStr = acc.FormatMoney(coin.Price)
 	}
-	app.Screen.GG.DrawStringWrapped(moneyStr, 0, symbol_y+250, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+	app.Screen.GG.DrawStringWrapped(moneyStr, 0, center-100, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+
+	app.Screen.DrawChart(coin, 200, center+125, float64(app.Screen.State.ScreenWidth-400), 300)
 
 	app.Screen.SetFontSize(40)
 	app.Screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(app.Screen.State.ScreenHeight)-90, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)

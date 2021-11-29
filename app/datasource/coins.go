@@ -6,14 +6,25 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/montanaflynn/stats"
 	coingecko "github.com/superoo7/go-gecko/v3"
 )
 
 type Coin struct {
-	ID     string
-	Name   string
-	Symbol string
-	Price  float32
+	ID          string
+	Name        string
+	Symbol      string
+	Price       float32
+	PricePoints []float64
+}
+
+func (coin *Coin) GetBaselinePrices() (float64, float64) {
+	var min, max float64
+
+	min, _ = stats.Min(coin.PricePoints)
+	max, _ = stats.Max(coin.PricePoints)
+
+	return min, max
 }
 
 type CoinsDataSource struct {
@@ -72,6 +83,15 @@ func (cds *CoinsDataSource) ApplyPricesToCoins(fiat string) error {
 
 	for _, coin := range cds.Coins {
 		coin.Price = (*prices)[coin.ID][fiat]
+		marketChart, err := cds.client.CoinsIDMarketChart(coin.ID, fiat, "1")
+		if err == nil {
+			pricePoints := []float64{}
+			for _, chartPoint := range *marketChart.Prices {
+				pricePoint := float64(chartPoint[1])
+				pricePoints = append(pricePoints, pricePoint)
+			}
+			coin.PricePoints = pricePoints
+		}
 		updatedCoins = append(updatedCoins, coin)
 	}
 
