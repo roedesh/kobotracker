@@ -54,6 +54,8 @@ func TrackerScreen(app *app.App, bus EventBus.Bus, koboin *koboin.TouchDevice) {
 	quit := make(chan struct{})
 
 	checkInput := func() {
+		defer app.CatchError()
+
 		_, _, err := koboin.GetInput()
 		if err == nil {
 			close(quit)
@@ -61,6 +63,8 @@ func TrackerScreen(app *app.App, bus EventBus.Bus, koboin *koboin.TouchDevice) {
 	}
 
 	updatePrices := func() {
+		defer app.CatchError()
+
 		err := app.Data.ApplyPricesToCoins(app.Config.Fiat)
 		if err != nil {
 			log.Println(err.Error())

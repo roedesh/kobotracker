@@ -38,11 +38,7 @@ func InitApp(version string) (app *App) {
 	return app
 }
 
-func (app *App) LoadConfig() {
-	app.Config = getConfigFromIniFile()
-}
-
-func (app *App) TearDown() {
+func (app *App) CatchError() {
 	if err := recover(); err != nil {
 		errorMessage := fmt.Sprintf("%s: %s", err, debug.Stack())
 		log.Println(errorMessage)
@@ -59,8 +55,22 @@ func (app *App) TearDown() {
 		app.Screen.DrawFrame()
 
 		time.Sleep(5 * time.Second)
-	}
 
+		app.Teardown()
+		os.Exit(1)
+	}
+}
+
+func (app *App) Exit() {
+	app.CatchError()
+	app.Teardown()
+}
+
+func (app *App) LoadConfig() {
+	app.Config = getConfigFromIniFile()
+}
+
+func (app *App) Teardown() {
 	app.Screen.Close()
 	if app.logFile != nil {
 		app.logFile.Close()

@@ -14,7 +14,7 @@ var (
 
 func main() {
 	cryptokobo := app.InitApp(version)
-	defer cryptokobo.TearDown()
+	defer cryptokobo.Exit()
 
 	touchPath := "/dev/input/event1"
 	touchInput := koboin.New(touchPath, 1080, 1440)
@@ -30,10 +30,11 @@ func main() {
 
 	bus.SubscribeAsync("QUIT", func() {
 		c <- true
-		return
 	}, false)
 
 	bus.SubscribeAsync("ROUTING", func(routeName string) {
+		defer cryptokobo.CatchError()
+
 		switch routeName {
 		case "boot":
 			cryptokobo.LoadConfig()
