@@ -79,7 +79,7 @@ func (screen *Screen) DrawChart(coin datasource.Coin, x float64, y float64, widt
 		}
 	}
 
-	screen.GG.SetLineWidth(3)
+	screen.GG.SetLineWidth(2.25)
 	screen.GG.Stroke()
 }
 
