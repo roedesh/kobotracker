@@ -2,5 +2,6 @@
 .vscode/
 
 # Export
-/cryptokobo
-cryptokobo.tar.gz
+.adds/kobotracker/assets/
+.adds/kobotracker/kobotracker
+kobotracker.tar.gz

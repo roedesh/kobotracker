@@ -1,5 +1,5 @@
 ENTRY=main.go
-BINARY=cryptokobo
+BINARY=kobotracker
 
 GOOS=linux
 GOARCH=arm
@@ -17,13 +17,14 @@ ifeq ($(VERSION),)
 endif
 
 build:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) CC=$(CC) CXX=$(CXX) go build -trimpath -ldflags="-X 'main.version=$(VERSION)'" -o $(BINARY) $(ENTRY)
+	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) CC=$(CC) CXX=$(CXX) go build -trimpath -ldflags="-X 'main.version=$(VERSION)'" -o .adds/kobotracker/$(BINARY) $(ENTRY)
 
 package:
-	tar -czvf cryptokobo.tar.gz ${BINARY} run.sh nickel.sh assets/* nm/*
+	cp -r assets/ .adds/kobotracker/
+	tar -czvf kobotracker.tar.gz .adds/*
 
 release: build package clean
 
 clean:
 	go clean
-	rm -f $(BINARY)
+	rm -f .adds/kobotracker/$(BINARY)

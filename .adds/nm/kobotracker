@@ -1,0 +1,1 @@
+menu_item:main:Kobotracker:cmd_spawn:quiet:exec /mnt/onboard/.adds/kobotracker/run.sh

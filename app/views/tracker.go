@@ -42,7 +42,13 @@ func renderTrackerScreen(app *app.App, acc accounting.Accounting, lowAcc account
 	return coinsIndex + 1
 }
 
-func TrackerScreen(app *app.App, bus EventBus.Bus, koboin *koboin.TouchDevice) {
+func TrackerScreen(app *app.App, bus EventBus.Bus) {
+	touchPath := "/dev/input/event1"
+	touchInput := koboin.New(touchPath, int(app.Screen.State.ScreenWidth), int(app.Screen.State.ScreenHeight))
+	if touchInput == nil {
+		panic("Could not get touch input")
+	}
+
 	app.Screen.Clear()
 
 	app.Data.LoadCoinsForIds(app.Config.Ids)
@@ -54,17 +60,13 @@ func TrackerScreen(app *app.App, bus EventBus.Bus, koboin *koboin.TouchDevice) {
 	quit := make(chan struct{})
 
 	checkInput := func() {
-		defer app.CatchError()
-
-		_, _, err := koboin.GetInput()
+		_, _, err := touchInput.GetInput()
 		if err == nil {
 			close(quit)
 		}
 	}
 
 	updatePrices := func() {
-		defer app.CatchError()
-
 		err := app.Data.ApplyPricesToCoins(app.Config.Fiat)
 		if err != nil {
 			log.Println(err.Error())

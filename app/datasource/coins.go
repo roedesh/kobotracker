@@ -1,10 +1,11 @@
 package datasource
 
 import (
-	"cryptokobo/app/network"
+	"crypto/tls"
 	"cryptokobo/app/utils"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/montanaflynn/stats"
 	coingecko "github.com/superoo7/go-gecko/v3"
@@ -31,7 +32,8 @@ type CoinsDataSource struct {
 	httpClient *http.Client
 	client     *coingecko.Client
 
-	Coins []Coin
+	Coins    []Coin
+	Insecure bool
 }
 
 func getIds(coins []Coin) []string {
@@ -43,11 +45,15 @@ func getIds(coins []Coin) []string {
 	return ids
 }
 
-func InitCoinsDataSource() (cds *CoinsDataSource) {
+func InitCoinsDataSource(insecure bool) (cds *CoinsDataSource) {
 	cds = &CoinsDataSource{}
-	cds.httpClient = network.GetHttpClient()
+	cds.httpClient = &http.Client{
+		Timeout:   time.Second * 5,
+		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}},
+	}
 	cds.client = coingecko.NewClient(cds.httpClient)
 	cds.Coins = []Coin{}
+	cds.Insecure = insecure
 
 	return cds
 }

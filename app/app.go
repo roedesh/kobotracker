@@ -26,7 +26,6 @@ type App struct {
 func InitApp(version string) (app *App) {
 	app = &App{}
 	app.Screen = ui.InitScreen()
-	app.Data = datasource.InitCoinsDataSource()
 	app.Version = version
 
 	logFile, err := os.OpenFile(utils.GetAbsolutePath("debug.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -34,6 +33,9 @@ func InitApp(version string) (app *App) {
 		app.logFile = logFile
 		log.SetOutput(app.logFile)
 	}
+
+	err = utils.SetupCertificates()
+	app.Data = datasource.InitCoinsDataSource(err != nil)
 
 	return app
 }
