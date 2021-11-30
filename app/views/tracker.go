@@ -18,7 +18,7 @@ func renderTrackerScreen(app *app.App, acc accounting.Accounting, middleAcc acco
 	app.Screen.SetFontSize(175)
 	coin := app.Data.Coins[coinsIndex]
 	center := float64(app.Screen.State.ScreenHeight) / 2
-	app.Screen.GG.DrawStringWrapped(coin.Name, 0, center-350, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+	app.Screen.GG.DrawStringWrapped(coin.Name, 0, center-500, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	min, max := coin.GetBaselinePrices()
 	app.Screen.SetFontSize(90)
@@ -27,9 +27,9 @@ func renderTrackerScreen(app *app.App, acc accounting.Accounting, middleAcc acco
 	minMoneyStr := utils.GetMoneyString(app.Config.Fiat, min)
 	maxMoneyStr := utils.GetMoneyString(app.Config.Fiat, max)
 
-	app.Screen.GG.DrawStringWrapped(moneyStr, 0, center-150, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+	app.Screen.GG.DrawStringWrapped(moneyStr, 0, center-300, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	app.Screen.DrawChart(coin, minMoneyStr, maxMoneyStr, 200, center+150, float64(app.Screen.State.ScreenWidth-400), 300)
+	app.Screen.DrawChart(coin, minMoneyStr, maxMoneyStr, 200, center-50, float64(app.Screen.State.ScreenWidth-400), 500)
 
 	app.Screen.SetFontSize(40)
 	app.Screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(app.Screen.State.ScreenHeight)-90, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
