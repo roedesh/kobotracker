@@ -2,6 +2,7 @@ package views
 
 import (
 	"cryptokobo/app"
+	"cryptokobo/app/utils"
 	"log"
 	"strings"
 	"time"
@@ -12,27 +13,20 @@ import (
 	"github.com/shermp/go-kobo-input/koboin"
 )
 
-func renderTrackerScreen(app *app.App, acc accounting.Accounting, lowAcc accounting.Accounting, coinsIndex int) int {
+func renderTrackerScreen(app *app.App, acc accounting.Accounting, middleAcc accounting.Accounting, lowAcc accounting.Accounting, coinsIndex int) int {
 	app.Screen.Clear()
 	app.Screen.SetFontSize(175)
 	coin := app.Data.Coins[coinsIndex]
 	center := float64(app.Screen.State.ScreenHeight) / 2
 	app.Screen.GG.DrawStringWrapped(coin.Name, 0, center-350, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	var moneyStr string
-	var minMoneyStr string
-	var maxMoneyStr string
 	min, max := coin.GetBaselinePrices()
 	app.Screen.SetFontSize(90)
-	if coin.Price < 0.01 {
-		moneyStr = lowAcc.FormatMoney(coin.Price)
-		minMoneyStr = lowAcc.FormatMoney(min)
-		maxMoneyStr = lowAcc.FormatMoney(max)
-	} else {
-		moneyStr = acc.FormatMoney(coin.Price)
-		minMoneyStr = acc.FormatMoney(min)
-		maxMoneyStr = acc.FormatMoney(max)
-	}
+
+	moneyStr := utils.GetMoneyString(app.Config.Fiat, float64(coin.Price))
+	minMoneyStr := utils.GetMoneyString(app.Config.Fiat, min)
+	maxMoneyStr := utils.GetMoneyString(app.Config.Fiat, max)
+
 	app.Screen.GG.DrawStringWrapped(moneyStr, 0, center-150, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	app.Screen.DrawChart(coin, minMoneyStr, maxMoneyStr, 200, center+150, float64(app.Screen.State.ScreenWidth-400), 300)
@@ -62,7 +56,8 @@ func TrackerScreen(app *app.App, bus EventBus.Bus) {
 
 	localeInfo := accounting.LocaleInfo[strings.ToUpper(app.Config.Fiat)]
 	acc := accounting.Accounting{Symbol: localeInfo.ComSymbol, Precision: 2, Thousand: localeInfo.ThouSep, Decimal: localeInfo.DecSep}
-	lowAcc := accounting.Accounting{Symbol: localeInfo.ComSymbol, Precision: 10, Thousand: localeInfo.ThouSep, Decimal: localeInfo.DecSep}
+	middleAcc := accounting.Accounting{Symbol: localeInfo.ComSymbol, Precision: 4, Thousand: localeInfo.ThouSep, Decimal: localeInfo.DecSep}
+	lowAcc := accounting.Accounting{Symbol: localeInfo.ComSymbol, Precision: 8, Thousand: localeInfo.ThouSep, Decimal: localeInfo.DecSep}
 
 	quit := make(chan struct{})
 
@@ -82,7 +77,7 @@ func TrackerScreen(app *app.App, bus EventBus.Bus) {
 
 	updatePrices()
 
-	coinsIndex := renderTrackerScreen(app, acc, lowAcc, 0)
+	coinsIndex := renderTrackerScreen(app, acc, middleAcc, lowAcc, 0)
 	showNextTicker := time.NewTicker(time.Duration(app.Config.ShowNextInterval) * time.Second)
 	updatePricesTicker := time.NewTicker(time.Duration(app.Config.UpdatePriceInterval) * time.Second)
 
@@ -94,7 +89,7 @@ func TrackerScreen(app *app.App, bus EventBus.Bus) {
 		for {
 			select {
 			case <-showNextTicker.C:
-				coinsIndex = renderTrackerScreen(app, acc, lowAcc, coinsIndex)
+				coinsIndex = renderTrackerScreen(app, acc, middleAcc, lowAcc, coinsIndex)
 			case <-updatePricesTicker.C:
 				bus.Publish("UPDATE_PRICES")
 			case <-quit:
