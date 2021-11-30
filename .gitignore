@@ -2,6 +2,5 @@
 .vscode/
 
 # Export
-.adds/kobotracker/assets/
 .adds/kobotracker/kobotracker
 kobotracker.tar.gz

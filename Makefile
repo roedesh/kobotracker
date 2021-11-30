@@ -20,7 +20,6 @@ build:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) CC=$(CC) CXX=$(CXX) go build -trimpath -ldflags="-X 'main.version=$(VERSION)'" -o .adds/kobotracker/$(BINARY) $(ENTRY)
 
 package:
-	cp -r assets/ .adds/kobotracker/
 	tar -czvf kobotracker.tar.gz .adds/*
 
 release: build package clean
