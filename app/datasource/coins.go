@@ -48,7 +48,7 @@ func getIds(coins []Coin) []string {
 func InitCoinsDataSource(insecure bool) (cds *CoinsDataSource) {
 	cds = &CoinsDataSource{}
 	cds.httpClient = &http.Client{
-		Timeout:   time.Second * 5,
+		Timeout:   time.Second * 10,
 		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}},
 	}
 	cds.client = coingecko.NewClient(cds.httpClient)
