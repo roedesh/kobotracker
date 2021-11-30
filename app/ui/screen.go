@@ -63,8 +63,15 @@ func (screen *Screen) DrawFrame() {
 	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{})
 }
 
-func (screen *Screen) DrawChart(coin datasource.Coin, x float64, y float64, width float64, height float64) {
+func (screen *Screen) DrawChart(coin datasource.Coin, minMoneyStr string, maxMoneyStr string, x float64, y float64, width float64, height float64) (int, int) {
 	min, max := coin.GetBaselinePrices()
+
+	var minIndex, maxIndex int
+
+	screen.SetFontSize(30)
+
+	screen.GG.DrawStringWrapped(maxMoneyStr, x, y-35, 0, 0, width, 0, gg.AlignRight)
+	screen.GG.DrawStringWrapped(minMoneyStr, x, y+height+15, 0, 0, width, 0, gg.AlignLeft)
 
 	for index, price := range coin.PricePoints {
 		stepWidth := width / float64(len(coin.PricePoints))
@@ -81,6 +88,17 @@ func (screen *Screen) DrawChart(coin datasource.Coin, x float64, y float64, widt
 
 	screen.GG.SetLineWidth(2.25)
 	screen.GG.Stroke()
+
+	screen.GG.SetRGBA(0, 0, 0, 0.2)
+	screen.GG.MoveTo(x, y)
+	screen.GG.LineTo(x+width, y)
+	screen.GG.MoveTo(x, y+height)
+	screen.GG.LineTo(x+width, y+height)
+	screen.GG.Stroke()
+
+	screen.GG.SetRGB(0, 0, 0)
+
+	return minIndex, maxIndex
 }
 
 func (screen *Screen) SetFontSize(size float64) {
