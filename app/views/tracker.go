@@ -2,7 +2,9 @@ package views
 
 import (
 	"cryptokobo/app"
+	"cryptokobo/app/device"
 	"cryptokobo/app/utils"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -19,6 +21,10 @@ func renderTrackerScreen(app *app.App, acc accounting.Accounting, middleAcc acco
 	coin := app.Data.Coins[coinsIndex]
 	center := float64(app.Screen.State.ScreenHeight) / 2
 	app.Screen.GG.DrawStringWrapped(coin.Name, 0, center-500, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+
+	app.Screen.SetFontSize(40)
+	batteryLevel := device.GetBatteryLevel()
+	app.Screen.GG.DrawStringWrapped(fmt.Sprintf("%d%%", batteryLevel), 100, 50, 0, 0, float64(app.Screen.State.ScreenWidth-200), 0, gg.AlignRight)
 
 	min, max := coin.GetBaselinePrices()
 	app.Screen.SetFontSize(90)
