@@ -4,7 +4,6 @@ import (
 	"cryptokobo/app"
 	"cryptokobo/app/device"
 	"cryptokobo/app/utils"
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -24,7 +23,8 @@ func renderTrackerScreen(app *app.App, acc accounting.Accounting, middleAcc acco
 
 	app.Screen.SetFontSize(40)
 	batteryLevel := device.GetBatteryLevel()
-	app.Screen.GG.DrawStringWrapped(fmt.Sprintf("%d%%", batteryLevel), 100, 50, 0, 0, float64(app.Screen.State.ScreenWidth-200), 0, gg.AlignRight)
+
+	app.Screen.DrawProgressBar(float64(app.Screen.State.ScreenWidth-130), 50, 80, 40, float64(batteryLevel))
 
 	min, max := coin.GetBaselinePrices()
 	app.Screen.SetFontSize(90)

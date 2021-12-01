@@ -101,6 +101,16 @@ func (screen *Screen) DrawChart(coin datasource.Coin, minMoneyStr string, maxMon
 	return minIndex, maxIndex
 }
 
+func (screen *Screen) DrawProgressBar(x float64, y float64, width float64, height float64, filled float64) {
+	screen.GG.DrawRectangle(x, y, width, height)
+	screen.GG.Stroke()
+
+	filled_width := (width / 100) * filled
+
+	screen.GG.DrawRectangle(x, y, filled_width, height)
+	screen.GG.Fill()
+}
+
 func (screen *Screen) SetFontSize(size float64) {
 	screen.GG.LoadFontFace(utils.GetAbsolutePath("assets/font.ttf"), size)
 }
