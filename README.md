@@ -20,6 +20,9 @@ Finding the CoinGecko ID is easy. Just go to the CoinGecko page for your crypto 
 
 After you have created the configuration file, you may start up the app by choosing the "Kobotracker" entry in NickelMenu.
 
+**NOTE:** in order to make web requests, this app will attempt to install a certificate bundle to `/etc/ssl/certs/ca-certificates.pem`. If certificates are already in place, this will be skipped. The certificate bundle that is used can be found at `.adds/kobotracker/assets/ca-certificates.pem`.
+
+
 ## Configuration
 - `ids`: list of CoinGecko ids separated by a space
 - `update_price_interval`: how long the app should wait before updating prices again (in seconds)
