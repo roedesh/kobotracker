@@ -1,4 +1,4 @@
-# CryptoKobo
+# Kobotracker
 
 Crypto tracker app for Kobo devices.
 
@@ -10,7 +10,7 @@ Crypto tracker app for Kobo devices.
 Download the latest release and extract the contents of `kobotracker.tar.gz` into the root of your Kobo device.
 This will also add a NickelMenu entry for you.
 
-After installing the app, you need to create the following file `.adds/kobotracker/config.ini`. It should at least have the `id` option set, which should be one or multiple CoinGecko ids separated by a space. Example:
+After installing the app, you need to create the following file `.adds/kobotracker/config.ini` on your Kobo. It should at least have the `id` option set, which should be one or multiple CoinGecko ids separated by a space. Example:
 
 ```
 ids=bitcoin ethereum cardano
