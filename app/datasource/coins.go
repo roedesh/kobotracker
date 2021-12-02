@@ -32,8 +32,7 @@ type CoinsDataSource struct {
 	httpClient *http.Client
 	client     *coingecko.Client
 
-	Coins    []Coin
-	Insecure bool
+	Coins []Coin
 }
 
 func getIds(coins []Coin) []string {
@@ -45,7 +44,7 @@ func getIds(coins []Coin) []string {
 	return ids
 }
 
-func InitCoinsDataSource(insecure bool) (cds *CoinsDataSource) {
+func NewCoinsDataSource(insecure bool) (cds *CoinsDataSource) {
 	cds = &CoinsDataSource{}
 	cds.httpClient = &http.Client{
 		Timeout:   time.Second * 10,
@@ -53,7 +52,6 @@ func InitCoinsDataSource(insecure bool) (cds *CoinsDataSource) {
 	}
 	cds.client = coingecko.NewClient(cds.httpClient)
 	cds.Coins = []Coin{}
-	cds.Insecure = insecure
 
 	return cds
 }

@@ -1,8 +1,13 @@
 package main
 
 import (
-	"cryptokobo/app"
+	"cryptokobo/app/config"
+	"cryptokobo/app/datasource"
+	"cryptokobo/app/handlers"
+	"cryptokobo/app/ui"
+	"cryptokobo/app/utils"
 	"cryptokobo/app/views"
+	"log"
 
 	"github.com/asaskevich/EventBus"
 )
@@ -12,28 +17,42 @@ var (
 )
 
 func main() {
-	cryptokobo := app.InitApp(version)
-	defer cryptokobo.Exit()
+	closeLogger := config.SetupLogger()
+	defer closeLogger()
 
-	bus := EventBus.New()
+	screen := ui.NewScreen()
+	defer handlers.HandlePanic(screen)
 
 	c := make(chan bool)
 	defer close(c)
 
-	bus.SubscribeAsync("QUIT", func() {
-		c <- true
-	}, false)
+	appConfig := config.NewAppConfigFromFile(utils.GetAbsolutePath("config.ini"))
+	appConfig.Version = version
+
+	err := config.SetupSSLCertificates()
+	if err != nil {
+		// If for whatever reason the SSL certificates cannot be found or setup,
+		// disable certificate validation to still allow web requests.
+		log.Println(err.Error())
+		appConfig.SkipCertificateValidation = true
+	}
+
+	bus := EventBus.New()
+	coinsDatasource := datasource.NewCoinsDataSource(appConfig.SkipCertificateValidation)
 
 	bus.SubscribeAsync("ROUTING", func(routeName string) {
-		defer cryptokobo.CatchError()
+		defer handlers.HandlePanic(screen)
 
 		switch routeName {
 		case "boot":
-			cryptokobo.LoadConfig()
-			views.BootScreen(cryptokobo, bus)
+			views.BootScreen(appConfig, bus, screen)
 		case "tracker":
-			views.TrackerScreen(cryptokobo, bus)
+			views.TrackerScreen(appConfig, bus, screen, coinsDatasource)
 		}
+	}, false)
+
+	bus.SubscribeAsync("QUIT", func() {
+		c <- true
 	}, false)
 
 	bus.Publish("ROUTING", "boot")

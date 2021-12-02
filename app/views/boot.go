@@ -1,29 +1,31 @@
 package views
 
 import (
-	"cryptokobo/app"
-	"fmt"
+	"cryptokobo/app/config"
+	"cryptokobo/app/ui"
 	"time"
 
 	"github.com/asaskevich/EventBus"
 )
 
-func BootScreen(app *app.App, bus EventBus.Bus) {
-	app.Screen.Clear()
-	app.Screen.GG.DrawString(fmt.Sprintf("CryptoKobo %s", app.Version), 100, 140)
-	app.Screen.SetFontSize(30)
-	app.Screen.GG.DrawString("Created by Ruud Schroën", 100, 310)
-	app.Screen.GG.DrawString("Get the latest version @ https://ruud.je/kobotracker", 100, 355)
+func BootScreen(config *config.AppConfig, bus EventBus.Bus, screen *ui.Screen) {
+	screen.Clear()
+	screen.GG.DrawString("KoboTracker", 100, 140)
+	screen.SetFontSize(42)
+	screen.GG.DrawString(config.Version, 100, 220)
+	screen.SetFontSize(30)
+	screen.GG.DrawString("Created by Ruud Schroën", 100, 350)
+	screen.GG.DrawString("Get the latest version @ https://ruud.je/kobotracker", 100, 395)
 
-	if app.Data.Insecure {
-		app.Screen.GG.DrawString("Failed to setup SSL certificates!", 100, 445)
+	if config.SkipCertificateValidation {
+		screen.GG.DrawString("Failed to setup SSL certificates!", 100, 475)
 	} else {
-		app.Screen.GG.DrawString("Successfully setup SSL certificates!", 100, 445)
+		screen.GG.DrawString("Successfully setup SSL certificates!", 100, 475)
 	}
+	screen.GG.DrawString("Loading...", 100, 515)
+	screen.DrawFrame()
 
-	app.Screen.DrawFrame()
-
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	bus.Publish("ROUTING", "tracker")
 }

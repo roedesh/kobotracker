@@ -1,7 +1,6 @@
-package app
+package config
 
 import (
-	"cryptokobo/app/utils"
 	"fmt"
 	"log"
 	"strings"
@@ -15,18 +14,20 @@ const (
 )
 
 type AppConfig struct {
-	Fiat                string
-	Ids                 []string
-	ShowNextInterval    int64
-	UpdatePriceInterval int64
+	Fiat                      string
+	Ids                       []string
+	ShowNextInterval          int64
+	UpdatePriceInterval       int64
+	SkipCertificateValidation bool
+	Version                   string
 }
 
-func getConfigFromIniFile() AppConfig {
-	config := AppConfig{}
+func NewAppConfigFromFile(filepath string) *AppConfig {
+	config := &AppConfig{}
 
-	iniConfig, err := ini.Load(utils.GetAbsolutePath("config.ini"))
+	iniConfig, err := ini.Load(filepath)
 	if err != nil {
-		panic(fmt.Sprintf("Could not load \"%s\".", utils.GetAbsolutePath("config.ini")))
+		panic(fmt.Sprintf("Could not load \"%s\".", filepath))
 	}
 
 	updatePriceInterval, err := iniConfig.Section("").Key("update_price_interval").Int64()
@@ -57,12 +58,13 @@ func getConfigFromIniFile() AppConfig {
 
 	fiat := iniConfig.Section("").Key("fiat").String()
 	if fiat == "" {
-		log.Println("No fiat currency set. Add \"fiat\" to your \"config.ini\".")
-		log.Println("Defaulting to € (Euro)")
+		log.Println("No fiat currency set. Defaulting to € (Euro).")
 		config.Fiat = "eur"
 	} else {
 		config.Fiat = fiat
 	}
+
+	config.SkipCertificateValidation = false
 
 	return config
 }

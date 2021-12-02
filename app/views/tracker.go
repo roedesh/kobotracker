@@ -1,71 +1,58 @@
 package views
 
 import (
-	"cryptokobo/app"
+	"cryptokobo/app/config"
+	"cryptokobo/app/datasource"
 	"cryptokobo/app/device"
+	"cryptokobo/app/ui"
 	"cryptokobo/app/utils"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/asaskevich/EventBus"
 	"github.com/fogleman/gg"
-	"github.com/leekchan/accounting"
 	"github.com/shermp/go-kobo-input/koboin"
 )
 
-func renderTrackerScreen(app *app.App, acc accounting.Accounting, middleAcc accounting.Accounting, lowAcc accounting.Accounting, coinsIndex int) int {
-	app.Screen.Clear()
-	app.Screen.SetFontSize(175)
-	coin := app.Data.Coins[coinsIndex]
-	center := float64(app.Screen.State.ScreenHeight) / 2
-	app.Screen.GG.DrawStringWrapped(coin.Name, 0, center-500, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, coinsIndex int) int {
+	screen.Clear()
+	screen.SetFontSize(175)
+	coin := coinsDatasource.Coins[coinsIndex]
+	center := float64(screen.State.ScreenHeight) / 2
+	screen.GG.DrawStringWrapped(coin.Name, 0, center-550, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	app.Screen.SetFontSize(40)
+	screen.SetFontSize(40)
 	batteryLevel := device.GetBatteryLevel()
+	screen.DrawProgressBar(float64(screen.State.ScreenWidth-180), 50, 80, 40, float64(batteryLevel))
 
-	app.Screen.DrawProgressBar(float64(app.Screen.State.ScreenWidth-130), 50, 80, 40, float64(batteryLevel))
+	screen.SetFontSize(100)
+	moneyStr := utils.GetMoneyString(appConfig.Fiat, float64(coin.Price))
+	screen.GG.DrawStringWrapped(moneyStr, 0, center-340, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	min, max := coin.GetBaselinePrices()
-	app.Screen.SetFontSize(90)
+	screen.DrawChart(coin.PricePoints, min, max, appConfig.Fiat, 175, center, float64(screen.State.ScreenWidth-400), 425)
 
-	moneyStr := utils.GetMoneyString(app.Config.Fiat, float64(coin.Price))
-	minMoneyStr := utils.GetMoneyString(app.Config.Fiat, min)
-	maxMoneyStr := utils.GetMoneyString(app.Config.Fiat, max)
+	screen.SetFontSize(40)
+	screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(screen.State.ScreenHeight)-90, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	app.Screen.GG.DrawStringWrapped(moneyStr, 0, center-300, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
+	screen.DrawFrame()
 
-	app.Screen.DrawChart(coin, minMoneyStr, maxMoneyStr, 200, center-50, float64(app.Screen.State.ScreenWidth-400), 500)
-
-	app.Screen.SetFontSize(40)
-	app.Screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(app.Screen.State.ScreenHeight)-90, 0, 0, float64(app.Screen.State.ScreenWidth), 1, gg.AlignCenter)
-
-	app.Screen.DrawFrame()
-
-	if coinsIndex+1 == len(app.Data.Coins) {
+	if coinsIndex+1 == len(coinsDatasource.Coins) {
 		return 0
 	}
 
 	return coinsIndex + 1
 }
 
-func TrackerScreen(app *app.App, bus EventBus.Bus) {
+func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen, coinsDatasource *datasource.CoinsDataSource) {
 	touchPath := "/dev/input/event1"
-	touchInput := koboin.New(touchPath, int(app.Screen.State.ScreenWidth), int(app.Screen.State.ScreenHeight))
+	touchInput := koboin.New(touchPath, int(screen.State.ScreenWidth), int(screen.State.ScreenHeight))
 	if touchInput == nil {
 		panic("Could not get touch input")
 	}
 
-	app.Screen.Clear()
-
-	app.Data.LoadCoinsForIds(app.Config.Ids)
-
-	localeInfo := accounting.LocaleInfo[strings.ToUpper(app.Config.Fiat)]
-	acc := accounting.Accounting{Symbol: localeInfo.ComSymbol, Precision: 2, Thousand: localeInfo.ThouSep, Decimal: localeInfo.DecSep}
-	middleAcc := accounting.Accounting{Symbol: localeInfo.ComSymbol, Precision: 4, Thousand: localeInfo.ThouSep, Decimal: localeInfo.DecSep}
-	lowAcc := accounting.Accounting{Symbol: localeInfo.ComSymbol, Precision: 8, Thousand: localeInfo.ThouSep, Decimal: localeInfo.DecSep}
-
 	quit := make(chan struct{})
+	coinsDatasource.LoadCoinsForIds(appConfig.Ids)
 
 	checkInput := func() {
 		_, _, err := touchInput.GetInput()
@@ -75,7 +62,7 @@ func TrackerScreen(app *app.App, bus EventBus.Bus) {
 	}
 
 	updatePrices := func() {
-		err := app.Data.ApplyPricesToCoins(app.Config.Fiat)
+		err := coinsDatasource.ApplyPricesToCoins(appConfig.Fiat)
 		if err != nil {
 			log.Println(err.Error())
 		}
@@ -83,9 +70,9 @@ func TrackerScreen(app *app.App, bus EventBus.Bus) {
 
 	updatePrices()
 
-	coinsIndex := renderTrackerScreen(app, acc, middleAcc, lowAcc, 0)
-	showNextTicker := time.NewTicker(time.Duration(app.Config.ShowNextInterval) * time.Second)
-	updatePricesTicker := time.NewTicker(time.Duration(app.Config.UpdatePriceInterval) * time.Second)
+	coinsIndex := renderTrackerScreen(appConfig, coinsDatasource, screen, 0)
+	showNextTicker := time.NewTicker(time.Duration(appConfig.ShowNextInterval) * time.Second)
+	updatePricesTicker := time.NewTicker(time.Duration(appConfig.UpdatePriceInterval) * time.Second)
 
 	bus.SubscribeAsync("CHECKINPUT", checkInput, false)
 	bus.SubscribeAsync("UPDATE_PRICES", updatePrices, false)
@@ -95,7 +82,7 @@ func TrackerScreen(app *app.App, bus EventBus.Bus) {
 		for {
 			select {
 			case <-showNextTicker.C:
-				coinsIndex = renderTrackerScreen(app, acc, middleAcc, lowAcc, coinsIndex)
+				coinsIndex = renderTrackerScreen(appConfig, coinsDatasource, screen, coinsIndex)
 			case <-updatePricesTicker.C:
 				bus.Publish("UPDATE_PRICES")
 			case <-quit:
