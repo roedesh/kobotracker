@@ -18,6 +18,8 @@ ids=bitcoin ethereum cardano
 
 Finding the CoinGecko ID is easy. Just go to the CoinGecko page for your crypto and copy the last part of the URL.
 
+After you have created the configuration file, you may start up the app by choosing the "Kobotracker" entry in NickelMenu.
+
 ## Configuration
 - `ids`: list of CoinGecko ids separated by a space
 - `update_price_interval`: how long the app should wait before updating prices again (in seconds)
