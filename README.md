@@ -36,6 +36,11 @@ After you have created the configuration file, you may start up the app by choos
 
 - Kobo Libra H2O
 
+## Running unit tests
+
+You can run the unit tests with the following command: `go test ./...`. 
+It will show the warning `cannot find -lfbink`, but this can be ignored.
+
 ## Building from scratch
 
 **NOTE:** To build this app, you will need a Linux machine. The koxtoolchain fails to build on other platforms. You might be able to get it to build on MacOS, but it would probably be best to use a virtual machine instead.
