@@ -35,15 +35,6 @@ type CoinsDataSource struct {
 	Coins []Coin
 }
 
-func getIds(coins []Coin) []string {
-	ids := []string{}
-	for _, coin := range coins {
-		ids = append(ids, coin.ID)
-	}
-
-	return ids
-}
-
 func NewCoinsDataSource(insecure bool) (cds *CoinsDataSource) {
 	cds = &CoinsDataSource{}
 	cds.httpClient = &http.Client{
