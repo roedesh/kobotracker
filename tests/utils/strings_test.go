@@ -11,15 +11,15 @@ func TestGetMoneyString(t *testing.T) {
 	lowAmountStr := utils.GetMoneyString("eur", 0.0012)
 
 	if highAmountStr != "€1,20" {
-		t.Errorf("Money string was incorrect, got: %s, want: €1,20.", highAmountStr)
+		t.Errorf("highAmountStr was incorrect, got: %s, want: €1,20.", highAmountStr)
 	}
 
 	if middleAmountStr != "€0,1200" {
-		t.Errorf("Money string was incorrect, got: %s, want: €0,1200.", middleAmountStr)
+		t.Errorf("middleAmountStr was incorrect, got: %s, want: €0,1200.", middleAmountStr)
 	}
 
 	if lowAmountStr != "€0,00120000" {
-		t.Errorf("Money string was incorrect, got: %s, want: €0,00120000.", lowAmountStr)
+		t.Errorf("lowAmountStr was incorrect, got: %s, want: €0,00120000.", lowAmountStr)
 	}
 }
 
