@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/montanaflynn/stats"
 	coingecko "github.com/superoo7/go-gecko/v3"
 )
 
@@ -17,15 +16,6 @@ type Coin struct {
 	Symbol      string
 	Price       float32
 	PricePoints []float64
-}
-
-func (coin *Coin) GetBaselinePrices() (float64, float64) {
-	var min, max float64
-
-	min, _ = stats.Min(coin.PricePoints)
-	max, _ = stats.Max(coin.PricePoints)
-
-	return min, max
 }
 
 type CoinsDataSource struct {

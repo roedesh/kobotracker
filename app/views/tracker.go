@@ -11,6 +11,7 @@ import (
 
 	"github.com/asaskevich/EventBus"
 	"github.com/fogleman/gg"
+	"github.com/montanaflynn/stats"
 )
 
 func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, coinsIndex int) int {
@@ -28,7 +29,9 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	moneyStr := utils.GetMoneyString(appConfig.Fiat, float64(coin.Price))
 	screen.GG.DrawStringWrapped(moneyStr, 0, center-340, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	min, max := coin.GetBaselinePrices()
+	min, _ := stats.Min(coin.PricePoints)
+	max, _ := stats.Max(coin.PricePoints)
+
 	screen.DrawChart(coin.PricePoints, min, max, appConfig.Fiat, 175, center, float64(screen.State.ScreenWidth-400), 425)
 
 	screen.SetFontSize(40)
