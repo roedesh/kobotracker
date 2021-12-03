@@ -23,7 +23,7 @@ func BootScreen(config *config.AppConfig, bus EventBus.Bus, screen *ui.Screen) {
 		screen.GG.DrawString("Successfully setup SSL certificates!", 100, 475)
 	}
 	screen.GG.DrawString("Loading...", 100, 515)
-	screen.DrawFrame()
+	screen.RenderFrame()
 
 	time.Sleep(1 * time.Second)
 

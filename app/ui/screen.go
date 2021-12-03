@@ -48,10 +48,6 @@ func NewScreen() *Screen {
 	return instance
 }
 
-func (screen *Screen) SetFontSize(size float64) {
-	screen.GG.LoadFontFace(utils.GetAbsolutePath("assets/font.ttf"), size)
-}
-
 func (screen *Screen) Clear() {
 	screen.GG.SetRGB(1, 1, 1)
 	screen.GG.Clear()
@@ -60,10 +56,6 @@ func (screen *Screen) Clear() {
 
 func (screen *Screen) Close() {
 	screen.fb.Close()
-}
-
-func (screen *Screen) DrawFrame() {
-	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{})
 }
 
 func (screen *Screen) DrawChart(pricePoints []float64, min float64, max float64, currency string, x float64, y float64, width float64, height float64) (int, int) {
@@ -113,4 +105,12 @@ func (screen *Screen) DrawProgressBar(x float64, y float64, width float64, heigh
 
 	screen.GG.DrawRectangle(x, y, filled_width, height)
 	screen.GG.Fill()
+}
+
+func (screen *Screen) RenderFrame() {
+	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{})
+}
+
+func (screen *Screen) SetFontSize(size float64) {
+	screen.GG.LoadFontFace(utils.GetAbsolutePath("assets/font.ttf"), size)
 }

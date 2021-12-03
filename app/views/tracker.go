@@ -11,7 +11,6 @@ import (
 
 	"github.com/asaskevich/EventBus"
 	"github.com/fogleman/gg"
-	"github.com/shermp/go-kobo-input/koboin"
 )
 
 func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, coinsIndex int) int {
@@ -35,7 +34,7 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	screen.SetFontSize(40)
 	screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(screen.State.ScreenHeight)-90, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	screen.DrawFrame()
+	screen.RenderFrame()
 
 	if coinsIndex+1 == len(coinsDatasource.Coins) {
 		return 0
@@ -45,17 +44,13 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 }
 
 func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen, coinsDatasource *datasource.CoinsDataSource) {
-	touchPath := "/dev/input/event1"
-	touchInput := koboin.New(touchPath, int(screen.State.ScreenWidth), int(screen.State.ScreenHeight))
-	if touchInput == nil {
-		panic("Could not get touch input")
-	}
+	touchDevice := device.GetTouchDevice(int(screen.State.ScreenWidth), int(screen.State.ScreenHeight))
 
 	quit := make(chan struct{})
 	coinsDatasource.LoadCoinsForIds(appConfig.Ids)
 
 	checkInput := func() {
-		_, _, err := touchInput.GetInput()
+		_, _, err := touchDevice.GetInput()
 		if err == nil {
 			close(quit)
 		}

@@ -80,13 +80,8 @@ func (cds *CoinsDataSource) LoadCoinsForIds(ids []string) {
 
 func (cds *CoinsDataSource) ApplyPricesToCoins(fiat string) error {
 	updatedCoins := []Coin{}
-	prices, err := cds.client.SimplePrice(getIds(cds.Coins), []string{fiat})
-	if err != nil {
-		return err
-	}
 
 	for _, coin := range cds.Coins {
-		coin.Price = (*prices)[coin.ID][fiat]
 		marketChart, err := cds.client.CoinsIDMarketChart(coin.ID, fiat, "1")
 		if err == nil {
 			pricePoints := []float64{}
@@ -95,6 +90,7 @@ func (cds *CoinsDataSource) ApplyPricesToCoins(fiat string) error {
 				pricePoints = append(pricePoints, pricePoint)
 			}
 			coin.PricePoints = pricePoints
+			coin.Price = float32(coin.PricePoints[len(coin.PricePoints)-1])
 		}
 		updatedCoins = append(updatedCoins, coin)
 	}
