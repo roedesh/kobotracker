@@ -59,7 +59,7 @@ func (cds *CoinsDataSource) LoadCoinsForIds(ids []string) {
 	cds.Coins = filteredCoins
 }
 
-func (cds *CoinsDataSource) ApplyPricesToCoins(fiat string) error {
+func (cds *CoinsDataSource) UpdatePricesOfCoins(fiat string) error {
 	updatedCoins := []Coin{}
 
 	for _, coin := range cds.Coins {

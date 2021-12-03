@@ -60,7 +60,7 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 	}
 
 	updatePrices := func() {
-		err := coinsDatasource.ApplyPricesToCoins(appConfig.Fiat)
+		err := coinsDatasource.UpdatePricesOfCoins(appConfig.Fiat)
 		if err != nil {
 			log.Println(err.Error())
 		}
