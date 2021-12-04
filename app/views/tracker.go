@@ -26,7 +26,7 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	screen.DrawProgressBar(float64(screen.State.ScreenWidth-180), 50, 80, 40, float64(batteryLevel))
 
 	screen.SetFontSize(100)
-	moneyStr := utils.GetMoneyString(appConfig.Fiat, float64(coin.Price))
+	moneyStr := utils.GetMoneyString(appConfig.Fiat, float64(coin.CurrentPrice))
 	screen.GG.DrawStringWrapped(moneyStr, 0, center-340, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	min, _ := stats.Min(coin.PricePoints)

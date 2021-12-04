@@ -11,27 +11,25 @@ import (
 )
 
 type Coin struct {
-	ID          string
-	Name        string
-	Symbol      string
-	Price       float32
-	PricePoints []float64
+	ID           string
+	Name         string
+	Symbol       string
+	CurrentPrice float32
+	PricePoints  []float64
 }
 
 type CoinsDataSource struct {
-	httpClient *http.Client
-	client     *coingecko.Client
+	client *coingecko.Client
 
 	Coins []Coin
 }
 
 func NewCoinsDataSource(insecure bool) (cds *CoinsDataSource) {
 	cds = &CoinsDataSource{}
-	cds.httpClient = &http.Client{
+	cds.client = coingecko.NewClient(&http.Client{
 		Timeout:   time.Second * 10,
 		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}},
-	}
-	cds.client = coingecko.NewClient(cds.httpClient)
+	})
 	cds.Coins = []Coin{}
 
 	return cds
@@ -71,7 +69,7 @@ func (cds *CoinsDataSource) UpdatePricesOfCoins(fiat string) error {
 				pricePoints = append(pricePoints, pricePoint)
 			}
 			coin.PricePoints = pricePoints
-			coin.Price = float32(coin.PricePoints[len(coin.PricePoints)-1])
+			coin.CurrentPrice = float32(coin.PricePoints[len(coin.PricePoints)-1])
 		}
 		updatedCoins = append(updatedCoins, coin)
 	}

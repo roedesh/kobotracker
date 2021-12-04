@@ -28,6 +28,7 @@ func main() {
 
 	appConfig := config.NewAppConfigFromFile(utils.GetAbsolutePath("config.ini"))
 	appConfig.Version = version
+	screen.DarkMode = appConfig.DarkMode
 
 	err := config.SetupSSLCertificates()
 	if err != nil {

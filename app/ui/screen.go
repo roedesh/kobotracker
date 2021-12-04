@@ -22,12 +22,14 @@ type Screen struct {
 	fb   *gofbink.FBInk
 	rgba *image.RGBA
 
-	GG    *gg.Context
-	State gofbink.FBInkState
+	DarkMode bool
+	GG       *gg.Context
+	State    gofbink.FBInkState
 }
 
 func NewScreen() *Screen {
 	instance := &Screen{}
+	instance.DarkMode = false
 	instance.State = gofbink.FBInkState{}
 
 	fbinkOpts := gofbink.FBInkConfig{}
@@ -108,7 +110,7 @@ func (screen *Screen) DrawProgressBar(x float64, y float64, width float64, heigh
 }
 
 func (screen *Screen) RenderFrame() {
-	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{})
+	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{IsNightmode: screen.DarkMode})
 }
 
 func (screen *Screen) SetFontSize(size float64) {
