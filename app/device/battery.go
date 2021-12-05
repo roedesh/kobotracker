@@ -24,3 +24,14 @@ func GetBatteryLevel() int {
 
 	return percentageNumber
 }
+
+func GetStatus() string {
+	capacityFile := fmt.Sprintf("%s/status", powerSupplyPath)
+
+	status, err := os.ReadFile(capacityFile)
+	if err != nil {
+		return "N/A"
+	}
+
+	return strings.TrimSuffix(string(status), "\n")
+}

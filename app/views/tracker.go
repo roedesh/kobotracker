@@ -1,20 +1,45 @@
 package views
 
 import (
+	"bytes"
 	"cryptokobo/app/config"
 	"cryptokobo/app/datasource"
 	"cryptokobo/app/device"
 	"cryptokobo/app/ui"
 	"cryptokobo/app/utils"
+	_ "embed"
+	"image"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/asaskevich/EventBus"
 	"github.com/fogleman/gg"
 	"github.com/montanaflynn/stats"
+	"github.com/nfnt/resize"
 )
 
+//go:embed bolt.png
+var boltImageBytes []byte
+var (
+	batteryLevel      int
+	batteryIsCharging bool
+	lock              sync.Mutex
+)
+
+func schedule(f func(), interval time.Duration) *time.Ticker {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for range ticker.C {
+			f()
+		}
+	}()
+	return ticker
+}
+
 func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, coinsIndex int) int {
+	lock.Lock()
+	defer lock.Unlock()
 	screen.Clear()
 	screen.SetFontSize(175)
 	coin := coinsDatasource.Coins[coinsIndex]
@@ -22,8 +47,14 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	screen.GG.DrawStringWrapped(coin.Name, 0, center-550, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	screen.SetFontSize(40)
-	batteryLevel := device.GetBatteryLevel()
+
 	screen.DrawProgressBar(float64(screen.State.ScreenWidth-180), 50, 80, 40, float64(batteryLevel))
+
+	if batteryIsCharging == true {
+		bolt, _, _ := image.Decode(bytes.NewReader(boltImageBytes))
+		resizedBolt := resize.Resize(40, 40, bolt, resize.Lanczos3)
+		screen.GG.DrawImage(resizedBolt, int(screen.State.ScreenWidth-230), 50)
+	}
 
 	screen.SetFontSize(100)
 	moneyStr := utils.GetMoneyString(appConfig.Fiat, float64(coin.CurrentPrice))
@@ -42,20 +73,35 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	if coinsIndex+1 == len(coinsDatasource.Coins) {
 		return 0
 	}
-
 	return coinsIndex + 1
 }
 
 func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen, coinsDatasource *datasource.CoinsDataSource) {
 	touchDevice := device.GetTouchDevice(int(screen.State.ScreenWidth), int(screen.State.ScreenHeight))
+	batteryLevel = device.GetBatteryLevel()
+	batteryIsCharging = device.GetStatus() == "Charging"
+	coinsIndex := 0
 
-	quit := make(chan struct{})
+	c := make(chan bool)
+	defer close(c)
 	coinsDatasource.LoadCoinsForIds(appConfig.Ids)
 
 	checkInput := func() {
 		_, _, err := touchDevice.GetInput()
 		if err == nil {
-			close(quit)
+			c <- true
+		}
+	}
+
+	checkDeviceChanges := func() {
+		newBatteryLevel := device.GetBatteryLevel()
+		newBatteryIsCharging := device.GetStatus() == "Charging"
+
+		hasChanges := newBatteryLevel != batteryLevel || newBatteryIsCharging != batteryIsCharging
+		batteryIsCharging = newBatteryIsCharging
+		batteryLevel = newBatteryLevel
+		if hasChanges == true {
+			_ = renderTrackerScreen(appConfig, coinsDatasource, screen, coinsIndex)
 		}
 	}
 
@@ -66,30 +112,25 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 		}
 	}
 
-	updatePrices()
+	showNextCoin := func() {
+		coinsIndex = renderTrackerScreen(appConfig, coinsDatasource, screen, coinsIndex)
+	}
 
-	coinsIndex := renderTrackerScreen(appConfig, coinsDatasource, screen, 0)
-	showNextTicker := time.NewTicker(time.Duration(appConfig.ShowNextInterval) * time.Second)
-	updatePricesTicker := time.NewTicker(time.Duration(appConfig.UpdatePriceInterval) * time.Second)
+	updatePrices()
+	showNextCoin()
+
+	schedule(checkDeviceChanges, 1*time.Second)
+	schedule(updatePrices, time.Duration(appConfig.UpdatePriceInterval)*time.Second)
+	schedule(showNextCoin, time.Duration(appConfig.ShowNextInterval)*time.Second)
 
 	bus.SubscribeAsync("CHECKINPUT", checkInput, false)
-	bus.SubscribeAsync("UPDATE_PRICES", updatePrices, false)
 	bus.Publish("CHECKINPUT")
 
-	go func() {
-		for {
-			select {
-			case <-showNextTicker.C:
-				coinsIndex = renderTrackerScreen(appConfig, coinsDatasource, screen, coinsIndex)
-			case <-updatePricesTicker.C:
-				bus.Publish("UPDATE_PRICES")
-			case <-quit:
-				showNextTicker.Stop()
-				updatePricesTicker.Stop()
-				bus.Unsubscribe("CHECKINPUT", checkInput)
-				bus.Unsubscribe("UPDATE_PRICES", updatePrices)
-				bus.Publish("QUIT")
-			}
+	for quit := range c {
+		if quit {
+			bus.Unsubscribe("CHECKINPUT", checkInput)
+			bus.Publish("QUIT")
+			break
 		}
-	}()
+	}
 }

@@ -7,6 +7,7 @@ require (
 	github.com/fogleman/gg v1.3.0
 	github.com/leekchan/accounting v1.0.0
 	github.com/montanaflynn/stats v0.6.6
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/shermp/go-fbink-v2 v1.20.2
 	github.com/shermp/go-kobo-input v0.0.0-20180928074949-be0734a2dcc6
 	github.com/superoo7/go-gecko v1.0.0
