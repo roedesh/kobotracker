@@ -37,7 +37,7 @@ func schedule(f func(), interval time.Duration) *time.Ticker {
 	return ticker
 }
 
-func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, coinsIndex int) int {
+func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, coinsIndex int) {
 	lock.Lock()
 	defer lock.Unlock()
 	screen.Clear()
@@ -69,18 +69,13 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(screen.State.ScreenHeight)-90, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	screen.RenderFrame()
-
-	if coinsIndex+1 == len(coinsDatasource.Coins) {
-		return 0
-	}
-	return coinsIndex + 1
 }
 
 func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen, coinsDatasource *datasource.CoinsDataSource) {
 	touchDevice := device.GetTouchDevice(int(screen.State.ScreenWidth), int(screen.State.ScreenHeight))
 	batteryLevel = device.GetBatteryLevel()
 	batteryIsCharging = device.GetStatus() == "Charging"
-	coinsIndex := 0
+	currentCoinIndex := -1
 
 	c := make(chan bool)
 	defer close(c)
@@ -101,7 +96,7 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 		batteryIsCharging = newBatteryIsCharging
 		batteryLevel = newBatteryLevel
 		if hasChanges == true {
-			_ = renderTrackerScreen(appConfig, coinsDatasource, screen, coinsIndex)
+			renderTrackerScreen(appConfig, coinsDatasource, screen, currentCoinIndex)
 		}
 	}
 
@@ -113,7 +108,12 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 	}
 
 	showNextCoin := func() {
-		coinsIndex = renderTrackerScreen(appConfig, coinsDatasource, screen, coinsIndex)
+		nextCoinIndex := currentCoinIndex + 1
+		if nextCoinIndex == len(coinsDatasource.Coins) {
+			nextCoinIndex = 0
+		}
+		renderTrackerScreen(appConfig, coinsDatasource, screen, nextCoinIndex)
+		currentCoinIndex = nextCoinIndex
 	}
 
 	updatePrices()
