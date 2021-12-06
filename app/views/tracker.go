@@ -24,6 +24,7 @@ var boltImageBytes []byte
 var (
 	batteryLevel      int
 	batteryIsCharging bool
+	coinIndex         int
 	lock              sync.Mutex
 )
 
@@ -37,12 +38,21 @@ func schedule(f func(), interval time.Duration) *time.Ticker {
 	return ticker
 }
 
-func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, coinsIndex int) {
+func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, updateCoinIndex bool) {
 	lock.Lock()
-	defer lock.Unlock()
+
+	if updateCoinIndex == true {
+		nextCoinIndex := coinIndex + 1
+		if nextCoinIndex >= len(coinsDatasource.Coins) {
+			nextCoinIndex = 0
+		}
+
+		coinIndex = nextCoinIndex
+	}
+
 	screen.Clear()
 	screen.SetFontSize(175)
-	coin := coinsDatasource.Coins[coinsIndex]
+	coin := coinsDatasource.Coins[coinIndex]
 	center := float64(screen.State.ScreenHeight) / 2
 	screen.GG.DrawStringWrapped(coin.Name, 0, center-550, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
@@ -69,13 +79,15 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(screen.State.ScreenHeight)-90, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	screen.RenderFrame()
+
+	lock.Unlock()
 }
 
 func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen, coinsDatasource *datasource.CoinsDataSource) {
 	touchDevice := device.GetTouchDevice(int(screen.State.ScreenWidth), int(screen.State.ScreenHeight))
 	batteryLevel = device.GetBatteryLevel()
 	batteryIsCharging = device.GetStatus() == "Charging"
-	currentCoinIndex := -1
+	coinIndex = -1
 
 	c := make(chan bool)
 	defer close(c)
@@ -96,7 +108,7 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 		batteryIsCharging = newBatteryIsCharging
 		batteryLevel = newBatteryLevel
 		if hasChanges == true {
-			renderTrackerScreen(appConfig, coinsDatasource, screen, currentCoinIndex)
+			renderTrackerScreen(appConfig, coinsDatasource, screen, false)
 		}
 	}
 
@@ -108,18 +120,13 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 	}
 
 	showNextCoin := func() {
-		nextCoinIndex := currentCoinIndex + 1
-		if nextCoinIndex == len(coinsDatasource.Coins) {
-			nextCoinIndex = 0
-		}
-		renderTrackerScreen(appConfig, coinsDatasource, screen, nextCoinIndex)
-		currentCoinIndex = nextCoinIndex
+		renderTrackerScreen(appConfig, coinsDatasource, screen, true)
 	}
 
 	updatePrices()
 	showNextCoin()
 
-	schedule(checkDeviceChanges, 1*time.Second)
+	schedule(checkDeviceChanges, 1500*time.Millisecond)
 	schedule(updatePrices, time.Duration(appConfig.UpdatePriceInterval)*time.Second)
 	schedule(showNextCoin, time.Duration(appConfig.ShowNextInterval)*time.Second)
 
