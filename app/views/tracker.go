@@ -50,7 +50,7 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 
 	screen.Clear()
 
-	screen.GG.DrawImage(assets.SignOutImage, 80, 50)
+	screen.GG.DrawImage(assets.SignOutImage, 76, 50)
 	screen.DrawProgressBar(float64(screen.State.ScreenWidth-180), 50, 80, 40, float64(batteryLevel))
 	if batteryIsCharging == true {
 		screen.GG.DrawImage(assets.BoltImage, int(screen.State.ScreenWidth-230), 50)

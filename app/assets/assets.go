@@ -21,7 +21,7 @@ var (
 
 func init() {
 	BoltImage = getImageFromBytes(boltImageBytes, 40, 40)
-	SignOutImage = getImageFromBytes(signoutImageBytes, 40, 40)
+	SignOutImage = getImageFromBytes(signoutImageBytes, 48, 48)
 }
 
 func getImageFromBytes(imageBytes []byte, width uint, height uint) image.Image {
