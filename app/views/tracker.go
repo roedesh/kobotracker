@@ -82,13 +82,15 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 
 	c := make(chan bool)
 	defer close(c)
-	coinsDatasource.LoadCoinsForIds(appConfig.Ids)
 
 	checkInput := func() {
-		_, _, err := touchDevice.GetInput()
-		if err == nil {
-			c <- true
+		for {
+			rx, ry, err := touchDevice.GetInput()
+			if err == nil && rx <= 150 && ry <= 150 {
+				break
+			}
 		}
+		c <- true
 	}
 
 	checkDeviceChanges := func() {
@@ -114,7 +116,6 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 		renderTrackerScreen(appConfig, coinsDatasource, screen, true)
 	}
 
-	updatePrices()
 	showNextCoin()
 
 	schedule(checkDeviceChanges, 1500*time.Millisecond)
