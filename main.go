@@ -46,7 +46,7 @@ func main() {
 
 		switch routeName {
 		case "boot":
-			views.BootScreen(appConfig, bus, screen)
+			views.BootScreen(appConfig, bus, screen, coinsDatasource)
 		case "tracker":
 			views.TrackerScreen(appConfig, bus, screen, coinsDatasource)
 		}

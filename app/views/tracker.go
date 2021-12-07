@@ -45,11 +45,10 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 		coinIndex = nextCoinIndex
 	}
 
-	screen.Clear()
-	screen.SetFontSize(175)
 	coin := coinsDatasource.Coins[coinIndex]
 	center := float64(screen.State.ScreenHeight) / 2
-	screen.GG.DrawStringWrapped(coin.Name, 0, center-550, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+
+	screen.Clear()
 
 	screen.GG.DrawImage(assets.SignOutImage, 80, 50)
 	screen.DrawProgressBar(float64(screen.State.ScreenWidth-180), 50, 80, 40, float64(batteryLevel))
@@ -57,17 +56,17 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 		screen.GG.DrawImage(assets.BoltImage, int(screen.State.ScreenWidth-230), 50)
 	}
 
+	screen.SetFontSize(175)
+	screen.GG.DrawStringWrapped(coin.Name, 0, center-500, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+
 	screen.SetFontSize(100)
 	moneyStr := utils.GetMoneyString(appConfig.Fiat, float64(coin.CurrentPrice))
-	screen.GG.DrawStringWrapped(moneyStr, 0, center-340, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+	screen.GG.DrawStringWrapped(moneyStr, 0, center-290, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	min, _ := stats.Min(coin.PricePoints)
 	max, _ := stats.Max(coin.PricePoints)
 
-	screen.DrawChart(coin.PricePoints, min, max, appConfig.Fiat, 175, center, float64(screen.State.ScreenWidth-400), 425)
-
-	screen.SetFontSize(40)
-	screen.GG.DrawStringWrapped("Touch screen to exit", 0, float64(screen.State.ScreenHeight)-90, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+	screen.DrawChart(coin.PricePoints, min, max, appConfig.Fiat, 175, center+50, float64(screen.State.ScreenWidth-400), 425)
 
 	screen.RenderFrame()
 
