@@ -1,14 +1,12 @@
 package views
 
 import (
-	"bytes"
+	"cryptokobo/app/assets"
 	"cryptokobo/app/config"
 	"cryptokobo/app/datasource"
 	"cryptokobo/app/device"
 	"cryptokobo/app/ui"
 	"cryptokobo/app/utils"
-	_ "embed"
-	"image"
 	"log"
 	"sync"
 	"time"
@@ -16,11 +14,8 @@ import (
 	"github.com/asaskevich/EventBus"
 	"github.com/fogleman/gg"
 	"github.com/montanaflynn/stats"
-	"github.com/nfnt/resize"
 )
 
-//go:embed bolt.png
-var boltImageBytes []byte
 var (
 	batteryLevel      int
 	batteryIsCharging bool
@@ -56,14 +51,10 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	center := float64(screen.State.ScreenHeight) / 2
 	screen.GG.DrawStringWrapped(coin.Name, 0, center-550, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	screen.SetFontSize(40)
-
+	screen.GG.DrawImage(assets.SignOutImage, 80, 50)
 	screen.DrawProgressBar(float64(screen.State.ScreenWidth-180), 50, 80, 40, float64(batteryLevel))
-
 	if batteryIsCharging == true {
-		bolt, _, _ := image.Decode(bytes.NewReader(boltImageBytes))
-		resizedBolt := resize.Resize(40, 40, bolt, resize.Lanczos3)
-		screen.GG.DrawImage(resizedBolt, int(screen.State.ScreenWidth-230), 50)
+		screen.GG.DrawImage(assets.BoltImage, int(screen.State.ScreenWidth-230), 50)
 	}
 
 	screen.SetFontSize(100)
