@@ -22,6 +22,9 @@ func main() {
 
 	screen := ui.NewScreen()
 	defer handlers.HandlePanic(screen)
+	defer screen.Close()
+
+	config.RunChecks()
 
 	c := make(chan bool)
 	defer close(c)

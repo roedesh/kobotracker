@@ -55,3 +55,9 @@ func SetupSSLCertificates() error {
 
 	return nil
 }
+
+func RunChecks() {
+	if _, err := os.Stat(utils.GetAbsolutePath("assets/font.ttf")); errors.Is(err, os.ErrNotExist) {
+		panic("Could not find \"assets/font.ttf\".")
+	}
+}
