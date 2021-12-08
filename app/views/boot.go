@@ -4,25 +4,23 @@ import (
 	"cryptokobo/app/config"
 	"cryptokobo/app/datasource"
 	"cryptokobo/app/ui"
+	"fmt"
 
 	"github.com/asaskevich/EventBus"
+	"github.com/fogleman/gg"
 )
 
 func BootScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen, coinsDatasource *datasource.CoinsDataSource) {
-	screen.Clear()
-	screen.GG.DrawString("KoboTracker", 100, 140)
-	screen.SetFontSize(42)
-	screen.GG.DrawString(appConfig.Version, 100, 220)
-	screen.SetFontSize(30)
-	screen.GG.DrawString("Created by Ruud Schroën", 100, 350)
-	screen.GG.DrawString("Get the latest version @ https://ruud.je/kobotracker", 100, 395)
+	center := float64(screen.State.ScreenHeight) / 2
 
-	if appConfig.SkipCertificateValidation {
-		screen.GG.DrawString("Failed to setup SSL certificates!", 100, 475)
-	} else {
-		screen.GG.DrawString("Successfully setup SSL certificates!", 100, 475)
-	}
-	screen.GG.DrawString("Loading...", 100, 515)
+	screen.Clear()
+	screen.SetFontSize(120)
+	screen.GG.DrawStringWrapped("Kobotracker", 0, center-250, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+	screen.SetFontSize(70)
+	screen.GG.DrawStringWrapped(fmt.Sprintf("Version: %s", appConfig.Version), 0, center-100, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+	screen.SetFontSize(50)
+	screen.GG.DrawStringWrapped("by Ruud Schroën", 0, float64(screen.State.ScreenHeight-100), 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+
 	screen.RenderFrame()
 
 	coinsDatasource.LoadCoinsForIds(appConfig.Ids)
