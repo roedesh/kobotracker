@@ -1,3 +1,5 @@
+# Taken from: https://github.com/koreader/koreader/blob/master/platform/kobo/nickel.sh
+
 #!/bin/sh
 PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/lib:"
 
