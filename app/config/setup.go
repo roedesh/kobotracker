@@ -1,9 +1,9 @@
 package config
 
 import (
-	"cryptokobo/app/utils"
 	"errors"
 	"io"
+	"kobotracker/app/utils"
 	"log"
 	"os"
 )

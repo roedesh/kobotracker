@@ -1,12 +1,12 @@
 package main
 
 import (
-	"cryptokobo/app/config"
-	"cryptokobo/app/datasource"
-	"cryptokobo/app/handlers"
-	"cryptokobo/app/ui"
-	"cryptokobo/app/utils"
-	"cryptokobo/app/views"
+	"kobotracker/app/config"
+	"kobotracker/app/datasource"
+	"kobotracker/app/handlers"
+	"kobotracker/app/ui"
+	"kobotracker/app/utils"
+	"kobotracker/app/views"
 	"log"
 
 	"github.com/asaskevich/EventBus"

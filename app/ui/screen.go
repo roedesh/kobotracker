@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"cryptokobo/app/utils"
 	"image"
+	"kobotracker/app/utils"
 
 	"github.com/fogleman/gg"
 	"github.com/shermp/go-fbink-v2/gofbink"

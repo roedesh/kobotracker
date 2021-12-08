@@ -1,4 +1,4 @@
-module cryptokobo
+module kobotracker
 
 go 1.17
 

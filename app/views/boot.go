@@ -1,9 +1,9 @@
 package views
 
 import (
-	"cryptokobo/app/config"
-	"cryptokobo/app/datasource"
-	"cryptokobo/app/ui"
+	"kobotracker/app/config"
+	"kobotracker/app/datasource"
+	"kobotracker/app/ui"
 
 	"github.com/asaskevich/EventBus"
 	"github.com/fogleman/gg"

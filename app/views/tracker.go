@@ -1,12 +1,12 @@
 package views
 
 import (
-	"cryptokobo/app/assets"
-	"cryptokobo/app/config"
-	"cryptokobo/app/datasource"
-	"cryptokobo/app/device"
-	"cryptokobo/app/ui"
-	"cryptokobo/app/utils"
+	"kobotracker/app/assets"
+	"kobotracker/app/config"
+	"kobotracker/app/datasource"
+	"kobotracker/app/device"
+	"kobotracker/app/ui"
+	"kobotracker/app/utils"
 	"log"
 	"sync"
 	"time"

@@ -2,7 +2,7 @@ package datasource
 
 import (
 	"crypto/tls"
-	"cryptokobo/app/utils"
+	"kobotracker/app/utils"
 	"net/http"
 	"strings"
 	"time"

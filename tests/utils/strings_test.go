@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cryptokobo/app/utils"
+	"kobotracker/app/utils"
 	"testing"
 )
 

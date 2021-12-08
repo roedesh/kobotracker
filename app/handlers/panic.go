@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"cryptokobo/app/ui"
-	"cryptokobo/app/utils"
 	"fmt"
+	"kobotracker/app/ui"
+	"kobotracker/app/utils"
 	"log"
 	"os"
 	"runtime/debug"
