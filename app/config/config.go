@@ -20,6 +20,7 @@ type AppConfig struct {
 	ShowNextInterval          int64
 	UpdatePriceInterval       int64
 	SkipCertificateValidation bool
+	TakeScreenshotOnExit      bool
 	Version                   string
 }
 
@@ -39,6 +40,9 @@ func NewAppConfigFromFile(filepath string) *AppConfig {
 
 	darkmode := iniConfig.Section("").Key("darkmode").String()
 	config.DarkMode = strings.ToLower(darkmode) == "true"
+
+	takeScreenshot := iniConfig.Section("").Key("take_screenshot").String()
+	config.TakeScreenshotOnExit = strings.ToLower(takeScreenshot) == "true"
 
 	fiat := iniConfig.Section("").Key("fiat").String()
 	if fiat == "" {

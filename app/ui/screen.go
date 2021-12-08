@@ -116,3 +116,7 @@ func (screen *Screen) RenderFrame() {
 func (screen *Screen) SetFontSize(size float64) {
 	screen.GG.LoadFontFace(utils.GetAbsolutePath("assets/font.ttf"), size)
 }
+
+func (screen *Screen) TakeScreenshot() {
+	screen.GG.SavePNG(utils.GetAbsolutePath("screenshot.png"))
+}

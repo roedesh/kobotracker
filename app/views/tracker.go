@@ -57,16 +57,16 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	}
 
 	screen.SetFontSize(175)
-	screen.GG.DrawStringWrapped(coin.Name, 0, center-500, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+	screen.GG.DrawStringWrapped(coin.Name, 0, center-450, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	screen.SetFontSize(100)
 	moneyStr := utils.GetMoneyString(appConfig.Fiat, float64(coin.CurrentPrice))
-	screen.GG.DrawStringWrapped(moneyStr, 0, center-290, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
+	screen.GG.DrawStringWrapped(moneyStr, 0, center-240, 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
 	min, _ := stats.Min(coin.PricePoints)
 	max, _ := stats.Max(coin.PricePoints)
 
-	screen.DrawChart(coin.PricePoints, min, max, appConfig.Fiat, 175, center+50, float64(screen.State.ScreenWidth-400), 425)
+	screen.DrawChart(coin.PricePoints, min, max, appConfig.Fiat, 175, center+100, float64(screen.State.ScreenWidth-400), 425)
 
 	screen.RenderFrame()
 
@@ -88,6 +88,9 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 			if err == nil && rx <= 150 && ry <= 150 {
 				break
 			}
+		}
+		if appConfig.TakeScreenshotOnExit {
+			screen.TakeScreenshot()
 		}
 		c <- true
 	}
