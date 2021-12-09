@@ -24,10 +24,11 @@ After you have created the configuration file, you may start up the app by choos
 
 
 ## Configuration
-- `ids`: list of CoinGecko ids separated by a space
-- `update_price_interval`: how long the app should wait before updating prices again (in seconds, defaults to 30)
-- `show_next_interval`: how long each crypto will be shown (in seconds, defaults to 10)
-- `fiat`: in which Fiat currency the price should be shown (defaults to 'eur')
+- `ids`; list of CoinGecko ids separated by a space.
+- `update_price_interval`; how long the app should wait before updating prices again (in seconds, defaults to 30).
+- `show_next_interval`; how long each crypto will be shown (in seconds, defaults to 10).
+- `fiat`; in which Fiat currency the price should be shown (defaults to "eur").
+- `days`; show the chart for x amount of days. If set to 1, it will show the hourly chart (defaults to 1).
 
 **NOTE:** keep in mind that CoinGecko has a rate limit of 50 requests per minute, which should be enough most of the time. Just dont set the `update_price_interval` too short, otherwise you might hit their rate limiting. Every price update does 1 request per id you have set.
 
