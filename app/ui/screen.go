@@ -69,7 +69,7 @@ func (screen *Screen) DrawChart(pricePoints []float64, min float64, max float64,
 
 	screen.SetFontSize(40)
 
-	screen.GG.DrawStringWrapped(fmt.Sprintf("%d-day chart", days), x, y-45, 0, 0, width, 0, gg.AlignRight)
+	screen.GG.DrawStringWrapped(fmt.Sprintf("%d-Day", days), x, y-45, 0, 0, width, 0, gg.AlignRight)
 	screen.GG.DrawStringWrapped(maxMoneyStr, x, y-45, 0, 0, width, 0, gg.AlignLeft)
 	screen.GG.DrawStringWrapped(minMoneyStr, x, y+height+15, 0, 0, width, 0, gg.AlignLeft)
 
