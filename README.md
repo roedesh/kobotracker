@@ -5,8 +5,6 @@ Crypto tracker app for Kobo devices.
 ![MIT License](https://img.shields.io/badge/license-MIT-green "MIT License")
 ![Version 0.0.1](https://img.shields.io/badge/version-0.0.1-blue "Version 0.0.1")
 
-![alt text](https://github.com/roedesh/cryptokobo/blob/main/cover.jpeg?raw=true)
-
 ## Installation
 
 Download the latest release and extract the contents of `kobotracker.tar.gz` into the root of your Kobo device.
