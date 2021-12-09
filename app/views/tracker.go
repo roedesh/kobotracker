@@ -66,7 +66,7 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 	min, _ := stats.Min(coin.PricePoints)
 	max, _ := stats.Max(coin.PricePoints)
 
-	screen.DrawChart(coin.PricePoints, min, max, appConfig.Fiat, 175, center+100, float64(screen.State.ScreenWidth-400), 425)
+	screen.DrawChart(coin.PricePoints, min, max, appConfig.DaysChart, appConfig.Fiat, 175, center+100, float64(screen.State.ScreenWidth-400), 425)
 
 	screen.RenderFrame()
 
@@ -108,7 +108,7 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 	}
 
 	updatePrices := func() {
-		err := coinsDatasource.UpdatePricesOfCoins(appConfig.Fiat)
+		err := coinsDatasource.UpdatePricesOfCoins(appConfig.Fiat, appConfig.DaysChart)
 		if err != nil {
 			log.Println(err.Error())
 		}

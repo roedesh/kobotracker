@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"image"
 	"kobotracker/app/utils"
 
@@ -60,15 +61,16 @@ func (screen *Screen) Close() {
 	screen.fb.Close()
 }
 
-func (screen *Screen) DrawChart(pricePoints []float64, min float64, max float64, currency string, x float64, y float64, width float64, height float64) (int, int) {
+func (screen *Screen) DrawChart(pricePoints []float64, min float64, max float64, days int, currency string, x float64, y float64, width float64, height float64) (int, int) {
 	var minIndex, maxIndex int
 
-	minMoneyStr := utils.GetMoneyString(currency, min)
 	maxMoneyStr := utils.GetMoneyString(currency, max)
+	minMoneyStr := utils.GetMoneyString(currency, min)
 
 	screen.SetFontSize(40)
 
-	screen.GG.DrawStringWrapped(maxMoneyStr, x, y-45, 0, 0, width, 0, gg.AlignRight)
+	screen.GG.DrawStringWrapped(fmt.Sprintf("%d-day chart", days), x, y-45, 0, 0, width, 0, gg.AlignRight)
+	screen.GG.DrawStringWrapped(maxMoneyStr, x, y-45, 0, 0, width, 0, gg.AlignLeft)
 	screen.GG.DrawStringWrapped(minMoneyStr, x, y+height+15, 0, 0, width, 0, gg.AlignLeft)
 
 	for index, price := range pricePoints {

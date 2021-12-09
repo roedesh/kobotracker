@@ -17,6 +17,7 @@ type AppConfig struct {
 	DarkMode                  bool
 	Fiat                      string
 	Ids                       []string
+	DaysChart                 int
 	ShowNextInterval          int64
 	UpdatePriceInterval       int64
 	SkipCertificateValidation bool
@@ -37,6 +38,12 @@ func NewAppConfigFromFile(filepath string) *AppConfig {
 	if len(config.Ids) == 0 {
 		panic("No CoinGecko ids set. Add \"ids\" to your \"config.ini\".")
 	}
+
+	daysChart, err := iniConfig.Section("").Key("days").Int()
+	if err != nil || daysChart < 1 {
+		daysChart = 1
+	}
+	config.DaysChart = daysChart
 
 	darkmode := iniConfig.Section("").Key("darkmode").String()
 	config.DarkMode = strings.ToLower(darkmode) == "true"

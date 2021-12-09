@@ -23,7 +23,7 @@ func BootScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen
 	screen.RenderFrame()
 
 	coinsDatasource.LoadCoinsForIds(appConfig.Ids)
-	err := coinsDatasource.UpdatePricesOfCoins(appConfig.Fiat)
+	err := coinsDatasource.UpdatePricesOfCoins(appConfig.Fiat, appConfig.DaysChart)
 	if err != nil {
 		panic(err.Error())
 	}

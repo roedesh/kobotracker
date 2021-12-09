@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"kobotracker/app/utils"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -57,11 +58,11 @@ func (cds *CoinsDataSource) LoadCoinsForIds(ids []string) {
 	cds.Coins = filteredCoins
 }
 
-func (cds *CoinsDataSource) UpdatePricesOfCoins(fiat string) error {
+func (cds *CoinsDataSource) UpdatePricesOfCoins(fiat string, days int) error {
 	updatedCoins := []Coin{}
 
 	for _, coin := range cds.Coins {
-		marketChart, err := cds.client.CoinsIDMarketChart(coin.ID, fiat, "1")
+		marketChart, err := cds.client.CoinsIDMarketChart(coin.ID, fiat, strconv.Itoa(days))
 		if err == nil {
 			pricePoints := []float64{}
 			for _, chartPoint := range *marketChart.Prices {
