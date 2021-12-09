@@ -3,7 +3,7 @@
 Crypto tracker app for Kobo devices.
 
 ![MIT License](https://img.shields.io/badge/license-MIT-green "MIT License")
-![Version 0.0.1](https://img.shields.io/badge/version-0.0.1-blue "Version 0.0.1")
+![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue "Version 1.0.0")
 
 ## Installation
 
