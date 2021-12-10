@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2021-12-09
+## [1.0.0] - 2021-12-10
 ### Added
 - First release!
 - Unit tests for utility functions
