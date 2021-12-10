@@ -32,7 +32,7 @@ func TestIsStringInSlice(t *testing.T) {
 	}
 
 	isInSlice = utils.IsStringInSlice("orange", slice)
-	if isInSlice == true {
+	if isInSlice {
 		t.Errorf("isInSlice was incorrect, got: %v, want: false.", isInSlice)
 	}
 }

@@ -20,7 +20,9 @@ var (
 	batteryLevel      int
 	batteryIsCharging bool
 	coinIndex         int
+	completedRounds   int
 	lock              sync.Mutex
+	flashScreen       bool
 )
 
 func schedule(f func(), interval time.Duration) *time.Ticker {
@@ -36,23 +38,14 @@ func schedule(f func(), interval time.Duration) *time.Ticker {
 func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasource.CoinsDataSource, screen *ui.Screen, updateCoinIndex bool) {
 	lock.Lock()
 
-	if updateCoinIndex == true {
-		nextCoinIndex := coinIndex + 1
-		if nextCoinIndex >= len(coinsDatasource.Coins) {
-			nextCoinIndex = 0
-		}
-
-		coinIndex = nextCoinIndex
-	}
-
-	coin := coinsDatasource.Coins[coinIndex]
 	center := float64(screen.State.ScreenHeight) / 2
+	coin := coinsDatasource.Coins[coinIndex]
 
 	screen.Clear()
 
 	screen.GG.DrawImage(assets.SignOutImage, 76, 50)
 	screen.DrawProgressBar(float64(screen.State.ScreenWidth-180), 50, 80, 40, float64(batteryLevel))
-	if batteryIsCharging == true {
+	if batteryIsCharging {
 		screen.GG.DrawImage(assets.BoltImage, int(screen.State.ScreenWidth-230), 50)
 	}
 
@@ -68,7 +61,25 @@ func renderTrackerScreen(appConfig *config.AppConfig, coinsDatasource *datasourc
 
 	screen.DrawChart(coin.PricePoints, min, max, appConfig.DaysChart, appConfig.Fiat, 175, center+100, float64(screen.State.ScreenWidth-400), 425)
 
-	screen.RenderFrame()
+	screen.RenderFrame(flashScreen)
+	if flashScreen {
+		flashScreen = false
+	}
+
+	if updateCoinIndex {
+		nextCoinIndex := coinIndex + 1
+		if nextCoinIndex >= len(coinsDatasource.Coins) {
+			completedRounds++
+
+			if completedRounds%3 == 0 {
+				flashScreen = true
+			}
+
+			nextCoinIndex = 0
+		}
+
+		coinIndex = nextCoinIndex
+	}
 
 	lock.Unlock()
 }
@@ -77,7 +88,8 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 	touchDevice := device.GetTouchDevice(int(screen.State.ScreenWidth), int(screen.State.ScreenHeight))
 	batteryLevel = device.GetBatteryLevel()
 	batteryIsCharging = device.GetStatus() == "Charging"
-	coinIndex = -1
+	coinIndex = 0
+	completedRounds = 0
 
 	c := make(chan bool)
 	defer close(c)
@@ -102,7 +114,7 @@ func TrackerScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Scr
 		hasChanges := newBatteryLevel != batteryLevel || newBatteryIsCharging != batteryIsCharging
 		batteryIsCharging = newBatteryIsCharging
 		batteryLevel = newBatteryLevel
-		if hasChanges == true {
+		if hasChanges {
 			renderTrackerScreen(appConfig, coinsDatasource, screen, false)
 		}
 	}

@@ -26,7 +26,7 @@ func HandlePanic(screen *ui.Screen) {
 		screen.GG.DrawString("Exiting app in 5 seconds..", 100, float64(screen.State.ScreenHeight)-130)
 		screen.SetFontSize(25)
 
-		screen.RenderFrame()
+		screen.RenderFrame(true)
 
 		time.Sleep(5 * time.Second)
 

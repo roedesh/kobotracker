@@ -111,8 +111,8 @@ func (screen *Screen) DrawProgressBar(x float64, y float64, width float64, heigh
 	screen.GG.Fill()
 }
 
-func (screen *Screen) RenderFrame() {
-	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{IsNightmode: screen.DarkMode})
+func (screen *Screen) RenderFrame(flashScreen bool) {
+	screen.fb.PrintRBGA(0, 0, screen.rgba, &gofbink.FBInkConfig{IsNightmode: screen.DarkMode, IsFlashing: flashScreen})
 }
 
 func (screen *Screen) SetFontSize(size float64) {

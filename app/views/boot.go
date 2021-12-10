@@ -20,7 +20,7 @@ func BootScreen(appConfig *config.AppConfig, bus EventBus.Bus, screen *ui.Screen
 	screen.SetFontSize(50)
 	screen.GG.DrawStringWrapped("by Ruud Schroën", 0, float64(screen.State.ScreenHeight-100), 0, 0, float64(screen.State.ScreenWidth), 1, gg.AlignCenter)
 
-	screen.RenderFrame()
+	screen.RenderFrame(false)
 
 	coinsDatasource.LoadCoinsForIds(appConfig.Ids)
 	err := coinsDatasource.UpdatePricesOfCoins(appConfig.Fiat, appConfig.DaysChart)
